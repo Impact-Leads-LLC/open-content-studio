@@ -1,0 +1,18 @@
+{
+  "verdict": "ready",
+  "score": 90,
+  "headline": "Steps people will copy into their next proposal, in Dana's words, with Priya's result as the proof. Ready to post.",
+  "checks": [
+    { "id": "stop", "pass": true, "note": "A plain instruction with a day in it: the first invoice on the day the work starts." },
+    { "id": "own", "pass": true, "note": "The three-payment split is Dana's framework, from the workshop module." },
+    { "id": "truth", "pass": true, "note": "60 days and the first third within a week match the transcript and the testimonial file." },
+    { "id": "person", "pass": true, "note": "Priya is named by first name only, as her permission allows." },
+    { "id": "fresh", "pass": true, "note": "One point, one proof." },
+    { "id": "door", "pass": true, "note": "One ask: comment SPLIT for the template, which suits a solution-aware reader." },
+    { "id": "lint", "pass": true, "note": "Clean, and the save line sits before the ask." }
+  ],
+  "fixes": [],
+  "question": "",
+  "hooks": ["Your next proposal can pay you in week one.", "A third up front ends the 60-day wait.", "Priya stopped waiting 60 days with one line in her proposals."],
+  "at": "2026-11-07T15:21:00Z"
+}

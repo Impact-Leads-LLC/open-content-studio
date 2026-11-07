@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "episode": {
+    "title": "Invoice on day one",
+    "slug": "2026-11-07-invoice-on-day-one",
+    "date": "2026-11-07",
+    "source": "transcript",
+    "video": [],
+    "guest": null,
+    "show": "The Calm Cash Show",
+    "link": null,
+    "minutes": 2,
+    "created": "2026-11-07T15:48:31.078Z"
+  },
+  "pieces": [
+    {
+      "id": "c01",
+      "kind": "carousel",
+      "title": "The 60-day wait",
+      "stage": "problem",
+      "funnel": "top",
+      "insight": "Invoicing late is a loan to your client",
+      "hook": "Your client is borrowing 60 days of your payroll.",
+      "cover_line": null,
+      "cover_accent": null,
+      "angle": "Invoicing at the end of a project is a free loan to the client, and the split ends it.",
+      "needs_take": false,
+      "verdict": "A number every studio owner can check against their own month, and a fix they can use on Monday.",
+      "score": 78,
+      "scores": {
+        "hook": 8,
+        "smart": 8,
+        "ip": 7,
+        "icp": 8,
+        "standalone": 8
+      },
+      "scout_score": 76,
+      "start": "00:24",
+      "end": null,
+      "speaker": "Dana Lee",
+      "quote": "Here's what that costs you.",
+      "ip_name": "Invoice day one",
+      "icp_pain": "We're busy and still broke at the end of the month.",
+      "service": "SPLIT",
+      "cta": "SPLIT",
+      "library": [
+        "training-the-60-day-wait.md"
+      ],
+      "outline": "Slide 1, story cover: Your client is borrowing 60 days of your payroll\nSlide 2, story: most studios invoice when the project ends\nSlide 3, story: four weeks of work plus net 30 plus a late payment is about 60 days\nSlide 4, story: for those 60 days you pay the team, the rent and the software\nSlide 5, story: the three-payment split\nSlide 6, story: put it in the proposal before anyone signs\nSlide 7, story: Priya's result, first third within a week\nSlide 8, outro",
+      "design": [
+        "Story format; the 60 days is the one yellow moment on the cover (00:24)."
+      ],
+      "status": "draft",
+      "dir": "pieces/c01-the-60-day-wait",
+      "made": "2026-11-07T15:48:49.322Z",
+      "history": [
+        {
+          "at": "2026-11-07T15:48:49.323Z",
+          "note": "picked (score 78)"
+        },
+        {
+          "at": "2026-11-07T15:51:23.849Z",
+          "note": "coach: fix 81"
+        }
+      ],
+      "verdict_coach": "fix",
+      "coach_score": 81
+    },
+    {
+      "id": "p01",
+      "kind": "post",
+      "title": "Three payments, one habit",
+      "stage": "solution",
+      "funnel": "middle",
+      "insight": "Invoicing late is a loan to your client",
+      "hook": "Send the first invoice the day the work starts.",
+      "cover_line": null,
+      "cover_accent": null,
+      "angle": "The three-payment split turns a 60-day wait into cash in the first week.",
+      "needs_take": false,
+      "verdict": "Steps people will save and copy into their next proposal.",
+      "score": 79,
+      "scores": {
+        "hook": 7,
+        "smart": 8,
+        "ip": 9,
+        "icp": 7,
+        "standalone": 9
+      },
+      "scout_score": 79,
+      "start": "01:01",
+      "end": null,
+      "speaker": "Dana Lee",
+      "quote": "Send the invoice the day the work starts.",
+      "ip_name": "The three-payment split",
+      "icp_pain": "I check the bank balance before I check email.",
+      "service": "SPLIT",
+      "cta": "SPLIT",
+      "library": [
+        "training-the-60-day-wait.md",
+        "testimonial-priya.md"
+      ],
+      "outline": null,
+      "design": [],
+      "status": "ready",
+      "dir": "pieces/p01-three-payments-one-habit",
+      "made": "2026-11-07T15:48:49.323Z",
+      "history": [
+        {
+          "at": "2026-11-07T15:48:49.323Z",
+          "note": "picked (score 79)"
+        },
+        {
+          "at": "2026-11-07T15:51:23.891Z",
+          "note": "coach: ready 90"
+        }
+      ],
+      "verdict_coach": "ready",
+      "coach_score": 90
+    }
+  ]
+}

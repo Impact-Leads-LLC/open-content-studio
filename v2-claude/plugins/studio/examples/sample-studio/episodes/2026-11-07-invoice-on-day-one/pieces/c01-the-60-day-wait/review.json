@@ -1,0 +1,21 @@
+{
+  "verdict": "fix",
+  "score": 81,
+  "headline": "The 60-day math is the reason to swipe, and every figure checks out. Slide 2 makes the reader wait for the point, so cut it to one line.",
+  "checks": [
+    { "id": "stop", "pass": true, "note": "The cover gives a number and a cost a studio owner feels: 60 days of payroll." },
+    { "id": "own", "pass": true, "note": "The three-payment split and 'Payroll Friday is boring now' are Dana's own." },
+    { "id": "truth", "pass": true, "note": "60 days, net 30 and Priya's first third within a week all match the transcript at 00:24 and 01:31 and the testimonial file." },
+    { "id": "person", "pass": true, "note": "Priya's words are hers, first name only, as her permission allows." },
+    { "id": "fresh", "pass": false, "note": "Slides 2 and 3 both set up the end-of-project invoice before the cost lands." },
+    { "id": "door", "pass": true, "note": "One next step: the free 20-minute cash check on the outro; the caption asks for SPLIT, which fits a problem-aware reader." },
+    { "id": "lint", "pass": true, "note": "No banned phrases, no em dashes, the save pill is on slide 4." }
+  ],
+  "fixes": [
+    { "where": "Slide 2", "problem": "Two sentences of setup before anything happens.", "before": "Most studios send the invoice when the project ends. It feels fair: you did the work, so now you bill for it.", "after": "Most studios send the invoice when the project ends." },
+    { "where": "Caption, paragraph 3", "problem": "Repeats slide 4 almost word for word.", "before": "For those 60 days you pay the team, the rent and the software. The client gets the project on credit.", "after": "That's two months of payroll your client is holding." }
+  ],
+  "question": "",
+  "hooks": [],
+  "at": "2026-11-07T15:20:00Z"
+}

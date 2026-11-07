@@ -1,0 +1,29 @@
+{
+  "name": "open-content-studio",
+  "owner": {
+    "name": "Mike Moll"
+  },
+  "metadata": {
+    "description": "Open Content Studio's Claude-only version (v2-claude/): the whole studio as one free Claude plugin. Version 1, the full tool, lives in v1-tool/ and isn't a plugin.",
+    "version": "2.1.0"
+  },
+  "plugins": [
+    {
+      "name": "studio",
+      "source": "./v2-claude/plugins/studio",
+      "description": "A free content studio inside Claude. Say quick start for your first carousel and posts in about 20 minutes; then episodes, clips and transcripts in, and reels, carousels, posts, post cards, covers, reviews, a review board and a posting calendar out, in your voice.",
+      "version": "2.1.0",
+      "category": "marketing",
+      "keywords": [
+        "content",
+        "social-media",
+        "reels",
+        "carousels",
+        "linkedin",
+        "captions",
+        "podcast",
+        "video"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+/* The brand layer: boxes in the social-graphics lock. Loaded after style.css by build_auto.py. The colours here are the
+   shipped defaults; build_auto.py swaps in the studio's palette when it writes the page (studio.py recolor). */
+/* Brand boxes: the social-graphics lock (the same rules as the carousel kit).
+   White cards with near-black ink, Libre Franklin caps titles, Poppins text,
+   one accent per piece. No glass, no dot bullets. */
+@font-face { font-family: "Libre Franklin"; src: url("assets/fonts/LibreFranklin-VF.ttf") format("truetype"); font-weight: 100 900; }
+@font-face { font-family: "Poppins"; src: url("assets/fonts/Poppins-Regular.ttf") format("truetype"); font-weight: 400; }
+@font-face { font-family: "Poppins"; src: url("assets/fonts/Poppins-SemiBold.ttf") format("truetype"); font-weight: 600; }
+
+.bcard { position: absolute; padding: 26px 30px 22px; background: #ffffff; color: #111111; border-radius: 0; }
+.bc-t { font-family: "Libre Franklin", sans-serif; font-weight: 800; font-size: 50px; line-height: 54px; letter-spacing: -0.005em;
+  text-transform: uppercase; padding-bottom: 14px; border-bottom: 2px solid #111111; }
+.bc-l { margin-top: 14px; font-family: "Poppins", sans-serif; font-weight: 400; font-size: 26px; line-height: 32px; color: #6b6b6b; }
+.bc-row { height: 64px; display: flex; align-items: center; font-family: "Poppins", sans-serif; font-weight: 600; font-size: 34px;
+  white-space: nowrap; }
+.bc-row + .bc-row { border-top: 1px solid rgba(17, 17, 17, 0.2); }
+
+.jt2 { background: #38b6ff; color: #111111; font-family: "Libre Franklin", sans-serif; font-weight: 800; font-size: 40px; line-height: 1;
+  padding: 16px 26px 15px; text-transform: uppercase; letter-spacing: 0.01em; white-space: nowrap; }
+
+/* the end card sits a little low, leaving the speaker's face clear above it */
+#endcard .endslot { top: 880px; }
+.bend { width: 880px; padding: 52px 56px 50px; background: #ffffff; color: #111111; }
+.bend .en { font-family: "Libre Franklin", sans-serif; font-weight: 800; font-size: 84px; line-height: 1; letter-spacing: -0.015em; }
+.bend .ep { margin-top: 14px; font-family: "Poppins", sans-serif; font-size: 30px; color: #6b6b6b; }
+.bend .ecta2 { margin-top: 42px; background: #38b6ff; color: #111111; font-family: "Libre Franklin", sans-serif; font-weight: 800;
+  font-size: 44px; line-height: 1.1; padding: 20px 26px; }
+.bend .eurl2 { margin-top: 18px; font-family: "Poppins", sans-serif; font-weight: 600; font-size: 34px; color: #111111; }

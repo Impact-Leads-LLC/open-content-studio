@@ -1,0 +1,174 @@
+/* Carousel kit (carousel skill v5): the brand layer for 1080x1350 slides.
+   Components are building blocks, not a layout.
+   Link it from a slide with <link rel="stylesheet" href="(path to)/kit.css">. */
+
+@font-face { font-family: 'Libre Franklin'; src: url('fonts/LibreFranklin-VF.ttf') format('truetype'); font-weight: 100 900; }
+@font-face { font-family: 'Poppins'; src: url('fonts/Poppins-Regular.ttf') format('truetype'); font-weight: 400; }
+@font-face { font-family: 'Poppins'; src: url('fonts/Poppins-Medium.ttf') format('truetype'); font-weight: 500; }
+@font-face { font-family: 'Poppins'; src: url('fonts/Poppins-SemiBold.ttf') format('truetype'); font-weight: 600; }
+
+/* =====================================================================================================================
+   THE PALETTE. In the app these five come from the studio's brand settings (context.json studio.palette): the builder
+   writes them onto every slide, after this file, so the values here are only the defaults. Every colour on a slide
+   comes from this block; the parts below use the role names.
+   ===================================================================================================================== */
+:root {
+  --primary: #1e4e6e;     /* boards: the cover and the outro, small marks on light slides (step numbers, arrows, dots) */
+  --accent: #ffc530;      /* the one loud moment: the cover's key words and the booking button, nothing else */
+  --dark: #0f1f2b;        /* the dark slide (body.navy) and the photo tags */
+  --paper: #ffffff;       /* the white slide and the cards on it */
+  --tint: #eef3f6;        /* the soft slide people read (body.soft) */
+  --fill-ink: #ffffff;    /* text on a fill (the builder works out dark or white from the palette) */
+  --accent-ink: #0c1a24;  /* text on the accent */
+
+  /* roles built from the palette */
+  --bg: var(--paper); --soft: var(--tint); --navy: var(--dark); --harbor: var(--primary); --yellow: var(--accent);
+  --fill: var(--primary);                                        /* dots, avatars, number badges, bars, my bubbles */
+  --deep: var(--primary);                                        /* the primary colour as TEXT on white */
+  --highlight: color-mix(in srgb, var(--accent) 45%, transparent);  /* the highlighter mark (.mark) */
+  --on-primary-text: #eef2f5;
+
+  /* neutrals */
+  --ink: #0c1a24;         /* headings and strong text */
+  --text: #3a4651;        /* body text */
+  --muted: #5f6b76;       /* footers, labels, page marks */
+  --line: #e4e9ee;        /* hairline borders */
+  --line-soft: #d9e0e6;   /* dim bars, browser dots */
+  --navy-text: #c0ccd6; --navy-muted: #9fb0bd;
+
+  --r: 6px;               /* the one radius */
+  --head: 'Libre Franklin', Arial, sans-serif;   /* headings and the big number */
+  --body: 'Poppins', Arial, sans-serif;          /* everything else */
+  --m: 76px;              /* side margin */
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1080px; height: 1350px; overflow: hidden; }
+body { position: relative; background: var(--bg); color: var(--text); font-family: var(--body);
+  font-size: 30px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+body.navy { background: var(--navy); color: var(--navy-text); }
+/* the primary colour: covers and outros only; reading slides stay light */
+body.harbor { background: var(--harbor); color: var(--on-primary-text); }
+body.harbor .h1, body.harbor .h2, body.harbor .h3, body.harbor .strong { color: #fff; }
+/* the one accent block: the booking button on the outro */
+.btn-y { display: inline-block; background: var(--yellow); color: var(--ink); border: 4px solid var(--ink); box-shadow: 12px 12px 0 var(--ink); padding: 32px 40px; font-family: var(--head); font-weight: 800; }
+body.soft { background: var(--soft); }
+img { display: block; }
+
+/* Layout helpers */
+.abs { position: absolute; }
+.pad { position: absolute; left: var(--m); right: var(--m); }
+.stack { display: flex; flex-direction: column; }
+.mid { justify-content: center; }
+
+/* Type. Sentence case; caps only when a slide really needs a label. */
+.display { font-family: var(--head); font-weight: 800; letter-spacing: -.04em; line-height: .95; color: var(--deep); }
+body.navy .display { color: var(--accent); }
+.h1 { font-family: var(--head); font-weight: 700; font-size: 96px; line-height: 1.02; letter-spacing: -.025em; color: var(--ink); }
+.h2 { font-family: var(--head); font-weight: 700; font-size: 62px; line-height: 1.08; letter-spacing: -.025em; color: var(--ink); }
+.h3 { font-family: var(--head); font-weight: 700; font-size: 44px; line-height: 1.12; letter-spacing: -.02em; color: var(--ink); }
+body.navy .h1, body.navy .h2, body.navy .h3 { color: #fff; }
+.lead { font-size: 32px; line-height: 1.5; }
+.small { font-size: 24px; }
+.muted { color: var(--muted); }
+body.navy .muted { color: var(--navy-muted); }
+.blue { color: var(--deep); }
+body.navy .blue { color: var(--accent); }
+.strong { color: var(--ink); font-weight: 600; }
+body.navy .strong { color: #fff; }
+.mark { background: linear-gradient(transparent 58%, var(--highlight) 58%); }
+
+/* Guest credit (chip) and the footer every slide carries */
+.chip { display: flex; align-items: center; gap: 18px; }
+.chip img { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; flex: none; }
+.foot { position: absolute; left: var(--m); right: var(--m); bottom: 64px; display: flex; align-items: center;
+  justify-content: space-between; font-size: 22px; color: var(--muted); }
+.foot .chip { gap: 14px; }
+.foot .chip img { width: 56px; height: 56px; }
+body.navy .foot { color: var(--navy-muted); }
+
+/* Email card */
+.email { background: #fff; border-radius: var(--r); color: var(--ink); padding: 52px; }
+.email.lined { border: 2px solid var(--line); }
+.email.lifted { box-shadow: 0 30px 80px rgba(0, 0, 0, .45); }
+.email__from { display: flex; align-items: center; gap: 20px; }
+.av { width: 76px; height: 76px; border-radius: 50%; background: var(--fill); color: var(--fill-ink); display: flex;
+  align-items: center; justify-content: center; font-family: var(--head); font-weight: 700; font-size: 36px; flex: none; }
+.av img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.email__name { font-weight: 600; font-size: 30px; }
+.email__meta { font-size: 24px; color: var(--muted); }
+.email__subject { margin-top: 28px; font-weight: 600; font-size: 32px; }
+.email__body { margin-top: 32px; font-size: 32px; line-height: 1.5; display: flex; flex-direction: column; gap: 20px; }
+.reply { display: inline-flex; margin-top: 34px; border: 2px solid var(--line); border-radius: 999px; padding: 14px 30px;
+  font-size: 26px; font-weight: 500; color: var(--ink); }
+
+/* Phone frame: put an inbox, a DM thread or a page inside */
+.phone { position: absolute; width: 580px; height: 900px; background: #fff; border: 3px solid var(--ink); border-radius: 64px;
+  padding: 66px 46px 46px; color: var(--ink); font-size: 26px; line-height: 1.5; overflow: hidden; }
+.phone::before { content: ""; position: absolute; left: 50%; top: 22px; transform: translateX(-50%); width: 120px; height: 14px;
+  border-radius: 7px; background: var(--ink); }
+.phone__top { display: flex; justify-content: space-between; font-size: 22px; color: var(--muted); }
+
+/* Browser frame: a real page as B-roll */
+.browser { border: 2px solid var(--line); border-radius: var(--r); overflow: hidden; background: #fff; }
+.browser__bar { height: 40px; background: var(--soft); display: flex; align-items: center; gap: 8px; padding: 0 16px;
+  font-size: 18px; color: var(--muted); }
+.browser__bar i { width: 11px; height: 11px; border-radius: 50%; background: var(--line-soft); flex: none; }
+.browser__bar span { margin-left: 10px; }
+.browser img { width: 100%; }
+
+/* Photos: episode stills, the host's photos, the guest's photo */
+.photo { position: absolute; background-size: cover; background-position: center; }
+.tag { position: absolute; left: 24px; bottom: 24px; padding: 12px 20px; border-radius: var(--r); background: var(--navy);
+  color: var(--navy-text); font-size: 24px; }
+.tag b { color: #fff; font-weight: 600; }
+.split { position: absolute; left: 0; top: 0; width: 1080px; height: 620px; display: flex; }
+.split > div { position: relative; flex: 1; background-size: cover; background-position: center; }
+
+/* Quote, in the speaker's words */
+.quote { font-family: var(--head); font-weight: 600; font-size: 58px; line-height: 1.18; letter-spacing: -.02em; color: var(--ink); }
+body.navy .quote { color: #fff; }
+
+/* Numbered callouts on an artifact, with a legend */
+.num { width: 52px; height: 52px; border-radius: 50%; background: var(--fill); color: var(--fill-ink); font-family: var(--head);
+  font-weight: 700; font-size: 28px; display: flex; align-items: center; justify-content: center; flex: none; }
+.legend { display: flex; flex-direction: column; gap: 18px; font-size: 28px; line-height: 1.4; color: var(--ink); }
+.legend > div { display: flex; gap: 22px; align-items: flex-start; }
+.legend > div > span:last-child { padding-top: 6px; }
+body.navy .legend { color: #fff; }
+
+/* DM or text thread */
+.thread { display: flex; flex-direction: column; gap: 18px; }
+.bubble { max-width: 80%; padding: 22px 28px; border-radius: 28px; font-size: 28px; line-height: 1.4; }
+.bubble.them { background: var(--soft); color: var(--ink); align-self: flex-start; border-bottom-left-radius: 8px; }
+.bubble.me { background: var(--fill); color: var(--fill-ink); align-self: flex-end; border-bottom-right-radius: 8px; }
+
+/* Side-by-side */
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+.compare__label { font-weight: 600; font-size: 26px; color: var(--muted); margin-bottom: 16px; }
+
+/* Process steps: numbered, no connector lines */
+.steps { display: flex; flex-direction: column; gap: 36px; }
+.steps > div { display: flex; gap: 26px; align-items: flex-start; }
+.steps > div > div { padding-top: 4px; }
+
+/* Data: horizontal bars with the value at the end */
+.bars { display: flex; flex-direction: column; gap: 28px; }
+.bar { display: grid; grid-template-columns: 300px 1fr; align-items: center; gap: 24px; font-size: 26px; color: var(--ink); }
+.bar i { display: flex; align-items: center; justify-content: flex-end; height: 56px; padding-right: 18px; border-radius: var(--r);
+  background: var(--fill); color: var(--fill-ink); font-style: normal; font-weight: 600; font-size: 24px; }
+.bar i.dim { background: var(--line-soft); color: var(--ink); }
+
+/* Plain list: small dots in the fill colour (glyphs are never bullets) */
+.dots { list-style: none; display: flex; flex-direction: column; gap: 22px; }
+.dots li { position: relative; padding-left: 36px; }
+.dots li::before { content: ""; position: absolute; left: 4px; top: .62em; width: 12px; height: 12px; border-radius: 50%; background: var(--fill); }
+
+/* Brand glyphs, only when the brain has a glyph library: paste its SVG with class="glyph" and a width */
+.glyph { fill: none; stroke: var(--ink); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.glyph .a { stroke: var(--fill); }
+.glyph .af { fill: var(--fill); stroke: none; }
+body.navy .glyph { stroke: #fff; }
+
+/* Page mark, top right */
+.page { position: absolute; right: var(--m); top: 56px; font-size: 20px; letter-spacing: 1px; color: var(--muted); }

@@ -1,0 +1,82 @@
+{
+  "at": "2026-11-07T15:48:49.323Z",
+  "mix": "full",
+  "source": "transcript",
+  "floor": 55,
+  "backup": 45,
+  "candidates": {
+    "reel": 0,
+    "carousel": 1,
+    "post": 2
+  },
+  "kept": {
+    "reel": 0,
+    "carousel": 1,
+    "post": 1
+  },
+  "added": {
+    "reel": 0,
+    "carousel": 1,
+    "post": 1
+  },
+  "below_bar": [],
+  "gaps": [
+    {
+      "kind": "carousel",
+      "stage": "unaware",
+      "want": 1,
+      "got": 0
+    },
+    {
+      "kind": "carousel",
+      "stage": "solution",
+      "want": 1,
+      "got": 0
+    },
+    {
+      "kind": "carousel",
+      "stage": "product",
+      "want": 1,
+      "got": 0
+    },
+    {
+      "kind": "carousel",
+      "stage": "most",
+      "want": 1,
+      "got": 0
+    },
+    {
+      "kind": "post",
+      "stage": "unaware",
+      "want": 1,
+      "got": 0
+    },
+    {
+      "kind": "post",
+      "stage": "problem",
+      "want": 1,
+      "got": 0
+    },
+    {
+      "kind": "post",
+      "stage": "product",
+      "want": 1,
+      "got": 0
+    },
+    {
+      "kind": "post",
+      "stage": "most",
+      "want": 1,
+      "got": 0
+    }
+  ],
+  "rejected": [
+    {
+      "title": "Double your revenue with better invoices",
+      "kind": "post",
+      "stage": "product",
+      "score": 56,
+      "reason": "Truth test: nothing in the episode or the library says revenue doubled; Priya's result is about when she gets paid."
+    }
+  ]
+}

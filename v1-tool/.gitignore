@@ -1,0 +1,12 @@
+node_modules/
+.next/
+.vercel/
+*.tsbuildinfo
+.DS_Store
+.env
+.env.*
+!.env.example
+brain-material/
+setup-progress.md
+engines/dist/
+supabase/.temp/

@@ -1,0 +1,34 @@
+{
+  "owner": "Alex",
+  "ownerFull": "Alex Rivera",
+  "brand": "Alex Rivera Studio",
+  "tagline": "Coach for service founders",
+  "handle": "@alexrivera",
+  "website": "https://example.com",
+  "audience": "service business owners",
+  "idealClient": "service founders who are good at the work and struggle to win the right clients",
+  "offerIdea": "the approach at the heart of the main offer can bring clients and revenue",
+  "ideas": [],
+  "bookingOffer": "a free 20-minute call",
+  "bookingUrl": "",
+  "shows": ["Your Show"],
+  "primaryNetwork": "linkedin",
+  "timezone": "America/New_York",
+  "timezoneLabel": "",
+  "slots": {
+    "hours": [9, 12, 17],
+    "sundayHours": [12, 15, 18],
+    "episodeDay": 0,
+    "episodeHour": 9,
+    "days": { "reel": [0, 1, 2, 3, 4, 5, 6], "carousel": [0, 1, 2, 3, 4, 5, 6], "post": [0, 1, 2, 3, 4, 5, 6] }
+  },
+  "palette": {
+    "primary": "#1E4E6E",
+    "accent": "#FFC530",
+    "ink": "#0F1F2B",
+    "paper": "#FFFFFF",
+    "soft": "#EEF3F6"
+  },
+  "fonts": { "head": "Libre Franklin", "body": "Poppins" },
+  "model": "claude-opus-5-5"
+}

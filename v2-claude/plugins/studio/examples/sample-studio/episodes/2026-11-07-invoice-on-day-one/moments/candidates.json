@@ -1,0 +1,18 @@
+{
+  "candidates": [
+    { "id": 0, "kind": "carousel", "title": "The 60-day wait", "start": "00:24", "end": "", "speaker": "Dana Lee",
+      "quote": "Here's what that costs you.", "scores": { "hook": 8, "smart": 8, "ip": 6, "icp": 8, "standalone": 8 },
+      "why": "Shows a studio owner the loan they're giving every client, with the math.", "ip_name": "Invoice day one",
+      "icp_pain": "We're busy and still broke at the end of the month.", "service": "SPLIT", "insight": "Invoicing late is a loan to your client",
+      "awareness": "problem", "library": ["training-the-60-day-wait.md"] },
+    { "id": 1, "kind": "post", "title": "Three payments, one habit", "start": "01:01", "end": "", "speaker": "Dana Lee",
+      "quote": "Send the invoice the day the work starts.", "scores": { "hook": 7, "smart": 8, "ip": 9, "icp": 7, "standalone": 9 },
+      "why": "Gives the three-payment split as steps to copy into the next proposal.", "ip_name": "The three-payment split",
+      "icp_pain": "I check the bank balance before I check email.", "service": "SPLIT", "insight": "Invoicing late is a loan to your client",
+      "awareness": "solution", "library": ["training-the-60-day-wait.md", "testimonial-priya.md"] },
+    { "id": 2, "kind": "post", "title": "Double your revenue with better invoices", "start": "01:31", "end": "", "speaker": "Dana Lee",
+      "quote": "One of my clients, Priya, runs a video studio.", "scores": { "hook": 6, "smart": 5, "ip": 5, "icp": 6, "standalone": 6 },
+      "why": "A result story.", "ip_name": "", "icp_pain": "", "service": "", "insight": "Invoicing late is a loan to your client",
+      "awareness": "product", "library": ["testimonial-priya.md"] }
+  ]
+}

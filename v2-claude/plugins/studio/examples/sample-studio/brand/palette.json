@@ -1,0 +1,22 @@
+{
+  "colors": {
+    "board": "#1E4E6E",
+    "accent": "#FFC530",
+    "ink": "#0C1A24",
+    "text": "#3A4651",
+    "soft": "#F4F6F8",
+    "mist": "#E8EEF3",
+    "deep": "#1E4E6E",
+    "on_accent": "#0C1A24",
+    "chip": "#0F0F0F"
+  },
+  "fonts": {
+    "head": { "family": "Libre Franklin", "file": "LibreFranklin-VF.ttf", "weight": 800 },
+    "body": { "family": "Poppins", "files": { "400": "Poppins-Regular.ttf", "500": "Poppins-Medium.ttf", "600": "Poppins-SemiBold.ttf" } },
+    "caption": { "family": "Libre Franklin Black", "file": "LibreFranklin-Black.ttf" }
+  },
+  "logo": null,
+  "headshot": null,
+  "dots": true,
+  "notes": "board: covers, outros and the board look of post cards. accent: one key word per graphic, nothing else. ink: dark type. text: body type on light slides. soft: the light slide ground. mist: light type on the board colour. deep: step numbers and arrows on light slides. on_accent: type on an accent fill. chip: the small label on covers. Fonts: a file name in studio/assets/fonts or one of the kit's fonts; the caption font must be a single static weight (reels burn it in). logo and headshot: paths in studio/assets, or null."
+}

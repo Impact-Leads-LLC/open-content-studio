@@ -1,0 +1,7 @@
+{
+  "timezone": "America/Chicago",
+  "slots": ["08:30", "12:00", "17:30"],
+  "per_day": { "reel": 1, "carousel": 1, "post": 1 },
+  "days": { "reel": ["mon", "tue", "wed", "thu", "fri"], "carousel": ["mon", "wed", "fri"], "post": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] },
+  "reserved": [{ "day": "sun", "time": "08:30", "what": "the full episode" }]
+}

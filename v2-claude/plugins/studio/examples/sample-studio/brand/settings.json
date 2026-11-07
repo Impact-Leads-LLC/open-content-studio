@@ -1,0 +1,14 @@
+{
+  "identity": { "name": "Dana Lee", "first_name": "Dana", "coach_name": "Coach Dana", "name_line": "Cash flow coach for creative studios", "handle": "@steadybooks", "brand": "Steady Books" },
+  "next_step": { "call_name": "free 20-minute cash check", "cta_label": "Book a free 20-minute cash check", "cta_where": "Link in bio", "booking_url": "https://example.com/cash-check" },
+  "lead_magnets": [{ "keyword": "SPLIT", "name": "the three-payment invoice template", "how": "comment", "link": "" }],
+  "networks": { "reel": ["instagram", "tiktok", "youtube", "linkedin"], "carousel": ["instagram", "linkedin"], "post": ["linkedin", "threads"] },
+  "main_network": "linkedin",
+  "scheduler": { "name": "none", "template": null },
+  "mix": "full",
+  "checkpoint": "plan",
+  "transcription": { "engine": "whisper.cpp", "language": "en" },
+  "library": { "connector": null, "notes": "" },
+  "pictures": { "fal": false, "model": "fal-ai/flux-pro/v1.1" },
+  "retention": { "renders_days": 7, "action": "delete", "move_to": null, "raw_footage": "after_all_posted", "raw_days": 7, "copy_video": false }
+}

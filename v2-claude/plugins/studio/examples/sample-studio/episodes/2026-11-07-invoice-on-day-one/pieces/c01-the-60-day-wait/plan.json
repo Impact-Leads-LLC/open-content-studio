@@ -1,0 +1,33 @@
+{
+  "format": "story",
+  "chip": "The Calm Cash Show",
+  "cover": { "top": "Your client is", "key": "60 days", "bottom": "into your payroll", "sticker": "One line in your proposal fixes it", "image": null },
+  "slides": [
+    { "blocks": [
+      { "kind": "p", "text": "Most studios send the invoice when the project ends. It feels fair: you did the work, so now you bill for it." },
+      { "kind": "bold", "text": "Here's what that habit costs you." } ] },
+    { "blocks": [
+      { "kind": "p", "text": "A four-week project. An invoice at the end, on net 30. A client who pays a little late, like most clients do." },
+      { "kind": "bold", "text": "That's about 60 days from the first day of work to the money." } ] },
+    { "blocks": [
+      { "kind": "p", "text": "For those 60 days you pay your team, your rent and your software. The client pays nothing yet." },
+      { "kind": "bold", "text": "You're lending them the whole project for free." } ] },
+    { "blocks": [
+      { "kind": "p", "text": "The fix is the three-payment split:" },
+      { "kind": "step", "text": "A third when the work starts." },
+      { "kind": "step", "text": "A third at the midpoint." },
+      { "kind": "step", "text": "A third on delivery." } ] },
+    { "blocks": [
+      { "kind": "p", "text": "Write the split into the price section of your proposal, before anyone signs. Send the first invoice with the signed proposal." },
+      { "kind": "bold", "text": "Then it isn't a surprise. It's how you work." } ] },
+    { "blocks": [
+      { "kind": "p", "text": "Priya runs a video studio. She used to wait about 60 days on every project." },
+      { "kind": "quote", "text": "\"New projects pay the first third within a week of kickoff.\"" },
+      { "kind": "bold", "text": "Payroll Friday is boring now." } ] }
+  ],
+  "save_slide": 4,
+  "save_text": "Save this for your next proposal",
+  "outro_headline": "Want three months of cash in view?",
+  "follow_topic": "cash flow fixes",
+  "credit": ""
+}

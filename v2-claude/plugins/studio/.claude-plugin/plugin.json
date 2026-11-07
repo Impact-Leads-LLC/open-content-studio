@@ -1,0 +1,10 @@
+{
+  "name": "studio",
+  "version": "2.1.0",
+  "description": "A free content studio inside Claude. Say quick start for your first carousel and posts in about 20 minutes. Then drop in an episode video, a clip or a transcript: Claude finds the moments, writes the posts and captions, builds carousels, post cards, covers and reels, reviews every piece against your own standard, shows one review board, and writes a posting calendar in your rhythm and time zone.",
+  "author": { "name": "Mike Moll", "url": "https://www.mikemoll.co" },
+  "homepage": "https://github.com/Impact-Leads-LLC/open-content-studio",
+  "repository": "https://github.com/Impact-Leads-LLC/open-content-studio",
+  "license": "MIT",
+  "keywords": ["content", "social-media", "reels", "carousels", "linkedin", "captions", "podcast", "video", "copywriting", "review"]
+}

@@ -1,0 +1,19 @@
+{
+  "verdicts": [
+    { "id": 0, "keep": true, "reject": "", "kind": "carousel", "title": "The 60-day wait", "start": "00:24", "end": "",
+      "scores": { "hook": 8, "smart": 8, "ip": 7, "icp": 8, "standalone": 8 },
+      "hook": "Your client is borrowing 60 days of your payroll.", "cover_line": null, "cover_accent": null,
+      "angle": "Invoicing at the end of a project is a free loan to the client, and the split ends it.", "needs_take": false, "cta": "SPLIT",
+      "design": ["Story format; the 60 days is the one yellow moment on the cover (00:24)."],
+      "outline": "Slide 1, story cover: Your client is borrowing 60 days of your payroll\nSlide 2, story: most studios invoice when the project ends\nSlide 3, story: four weeks of work plus net 30 plus a late payment is about 60 days\nSlide 4, story: for those 60 days you pay the team, the rent and the software\nSlide 5, story: the three-payment split\nSlide 6, story: put it in the proposal before anyone signs\nSlide 7, story: Priya's result, first third within a week\nSlide 8, outro",
+      "verdict": "A number every studio owner can check against their own month, and a fix they can use on Monday.", "insight": "Invoicing late is a loan to your client", "awareness": "problem" },
+    { "id": 1, "keep": true, "reject": "", "kind": "post", "title": "Three payments, one habit", "start": "01:01", "end": "",
+      "scores": { "hook": 7, "smart": 8, "ip": 9, "icp": 7, "standalone": 9 },
+      "hook": "Send the first invoice the day the work starts.", "cover_line": null, "cover_accent": null,
+      "angle": "The three-payment split turns a 60-day wait into cash in the first week.", "needs_take": false, "cta": "SPLIT",
+      "design": [], "outline": "", "verdict": "Steps people will save and copy into their next proposal.", "insight": "Invoicing late is a loan to your client", "awareness": "solution" },
+    { "id": 2, "keep": false, "reject": "Truth test: nothing in the episode or the library says revenue doubled; Priya's result is about when she gets paid.", "kind": "post",
+      "title": "Double your revenue with better invoices", "start": "01:31", "end": "", "scores": { "hook": 6, "smart": 5, "ip": 5, "icp": 6, "standalone": 6 },
+      "hook": "", "cover_line": null, "cover_accent": null, "angle": "", "needs_take": false, "cta": "", "design": [], "outline": "", "verdict": "", "insight": "Invoicing late is a loan to your client", "awareness": "product" }
+  ]
+}
