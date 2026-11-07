@@ -181,6 +181,7 @@ details { margin: 8px 0; } summary { cursor: pointer; color: var(--ink); font-we
 th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); } th { color: var(--ink); }
 code { background: var(--code); border-radius: 4px; padding: 0 4px; }
 footer { margin-top: 32px; color: var(--muted); font-size: 13px; }
+footer .by { margin-top: 6px; } footer .by a { color: var(--ink); font-weight: 600; text-decoration: none; }
 [hidden] { display: none !important; }
 </style></head>
 <body><div class="wrap">
@@ -197,7 +198,7 @@ footer { margin-top: 32px; color: var(--muted); font-size: 13px; }
 ${cards.join("\n")}
 </main>
 ${cal}
-<footer>Built ${new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })} from <code>${escRaw(path.basename(ep))}</code>. Ask Claude to rebuild the board after any change.</footer>
+<footer>Built ${new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })} from <code>${escRaw(path.basename(ep))}</code>. Ask Claude to rebuild the board after any change.<p class="by">Open Content Studio, free from Mike Moll · <a href="https://www.mikemoll.co/?utm_source=open-content-studio&amp;utm_medium=board" target="_blank" rel="noopener">mikemoll.co</a> · Helping service founders get on podcasts and generate revenue</p></footer>
 </div>
 <script>
 (function () {

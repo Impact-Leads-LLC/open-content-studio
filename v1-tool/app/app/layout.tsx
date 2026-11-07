@@ -48,6 +48,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body style={{ margin: 0, background: "#f4f6f8", color: "#0c1a24", fontFamily: "Poppins, Arial, sans-serif" }}>
         <Nav />
         {children}
+        <footer style={{ padding: "28px 24px 40px", textAlign: "center", color: "#5f6b76", fontSize: 13, lineHeight: 1.6 }}>
+          Open Content Studio, free from Mike Moll ·{" "}
+          <a href="https://www.mikemoll.co/?utm_source=open-content-studio&utm_medium=app" target="_blank" rel="noopener" style={{ color: "#0c1a24", fontWeight: 600, textDecoration: "none" }}>mikemoll.co</a>
+          {" "}· Helping service founders get on podcasts and generate revenue
+        </footer>
       </body>
     </html>
   );

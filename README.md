@@ -1,5 +1,8 @@
 # Open Content Studio
 
+**Free from [Mike Moll](https://www.mikemoll.co/?utm_source=open-content-studio&utm_medium=github) · mikemoll.co ·
+Helping service founders get on podcasts and generate revenue.**
+
 A free content studio that turns your episodes, videos and teaching material into reels, carousels, posts and
 graphics, written in your voice and reviewed before anything goes out. Two ways to run it:
 
@@ -32,10 +35,13 @@ Everything runs on accounts you open and pay for yourself. Nothing connects back
 else's studio, and no one here can see your material, your keys or your posts. Keep your own copy in a private
 repository, since it will hold your brand files.
 
-## Licence
+## Who made it
 
-Free to use, change and share under the [MIT License](LICENSE). It comes as is, with no support or warranty. The fonts,
-sound effects, face model and other parts made by other people keep their own licences:
+Open Content Studio is free from [Mike Moll](https://www.mikemoll.co/?utm_source=open-content-studio&utm_medium=github),
+helping service founders get on podcasts and generate revenue. One podcast interview gives this studio 25+ pieces to
+post. Want to be a guest on other people's shows?
+[Book a free 20-minute assessment](https://www.mikemoll.co/podcast-guesting?utm_source=open-content-studio&utm_medium=github#book).
+
+Free to use, change and share ([MIT License](LICENSE)). It comes as is, with no support or warranty. The fonts, sound
+effects, face model and other parts made by other people keep their own licences:
 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
-
-Built from the content studio [Mike Moll](https://www.mikemoll.co) runs for his own brand.

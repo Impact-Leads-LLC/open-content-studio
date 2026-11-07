@@ -97,6 +97,7 @@ run works end to end in Cowork.
 
 ## Credits
 
-Adapted from the content studio Mike Moll runs for his own business, shared free under the MIT License. The humanizer
+Open Content Studio is free from [Mike Moll](https://www.mikemoll.co/?utm_source=open-content-studio&utm_medium=github)
+(mikemoll.co), helping service founders get on podcasts and generate revenue. MIT License. The humanizer
 guide is by Siqi Chen (MIT). Fonts: Libre Franklin and Poppins (SIL Open Font License). The full list is in
 `THIRD-PARTY-NOTICES.md` at the top of the repository.

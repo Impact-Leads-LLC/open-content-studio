@@ -83,5 +83,6 @@ the interview. You paste every key into Vercel yourself; the setup never asks fo
   their open licences.
 - **Send drafts first.** Your first sends to the scheduler should be drafts; check them there before you schedule.
 
-Built from the content studio Mike Moll runs for his own brand, shared free under the MIT License (see `LICENSE` and
+Open Content Studio is free from [Mike Moll](https://www.mikemoll.co/?utm_source=open-content-studio&utm_medium=github)
+(mikemoll.co), helping service founders get on podcasts and generate revenue. MIT License (see `LICENSE` and
 `THIRD-PARTY-NOTICES.md` at the top of the repository).

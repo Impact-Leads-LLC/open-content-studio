@@ -1,5 +1,8 @@
 # studio (the plugin)
 
+Free from [Mike Moll](https://www.mikemoll.co/?utm_source=open-content-studio&utm_medium=github) · mikemoll.co ·
+Helping service founders get on podcasts and generate revenue.
+
 The content studio as one Claude plugin. Start with **"quick start"** for your first content in about 20 minutes,
 then "set up my studio" for the full interview, then "run the studio". The kit's README one folder up covers
 requirements and installing.
