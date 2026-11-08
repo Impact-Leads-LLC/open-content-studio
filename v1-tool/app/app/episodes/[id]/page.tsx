@@ -649,6 +649,14 @@ export default function Episode() {
                   <span style={chip(STATUS[sel.status] ?? STATUS.draft)}>{STATUS[sel.status]?.label}</span>
                 </div>
                 <h2 style={{ margin: 0, font: `800 21px/1.2 ${HEAD}` }}>{sel.title}</h2>
+                {/* an unreviewed piece: keep or kill it right here, without scrolling to the bar at the bottom */}
+                {sel.status === "concept" && next?.go && (
+                  <div style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap", marginTop: -4 }}>
+                    <button style={{ ...btn, minHeight: 44, padding: "0 22px" }} disabled={!!busy} onClick={next.go}>{busy ? "Working…" : next.label}</button>
+                    {next.alt && <button style={{ ...link, fontSize: 13.5 }} disabled={!!busy} onClick={next.alt.go}>{next.alt.label}</button>}
+                    <button style={{ ...link, fontSize: 13.5, color: C.muted }} disabled={!!busy} onClick={() => patch(sel.id, { status: "skipped" })}>Kill it</button>
+                  </div>
+                )}
                 {/* who it's for, and the insight it shares with its other angles (lib/stages.ts) */}
                 {/* the stage the piece is built for, which the team can set or change (a piece added by hand has none) */}
                 {sel.kind !== "episode" && (
@@ -981,9 +989,9 @@ export default function Episode() {
             {/* the one button that moves it forward, always in reach */}
             {sel && next ? (
               <div style={{ position: "sticky", bottom: 0, margin: "4px -26px 0", padding: "12px 26px", background: "#fff", borderTop: `1px solid ${C.line}`, borderRadius: "0 0 6px 6px", display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap", boxShadow: "0 -10px 24px rgba(11,27,39,0.07)", zIndex: 5 }}>
-                <span style={{ flex: "1 1 260px", fontSize: 12.5, color: C.text, lineHeight: 1.45 }}>{next.note}</span>
+                <span style={{ flex: "1 1 260px", fontSize: 12.5, color: C.text, lineHeight: 1.45 }}>{busy || next.note}</span>
                 {next.alt && <button style={{ ...link, fontSize: 13 }} onClick={next.alt.go}>{next.alt.label}</button>}
-                {next.go ? <button style={{ ...btn, minHeight: 48, padding: "0 24px" }} disabled={!!busy} onClick={next.go}>{next.label}</button> : <b style={{ font: `700 15px ${HEAD}` }}>{next.label}</b>}
+                {next.go ? <button style={{ ...btn, minHeight: 48, padding: "0 24px" }} disabled={!!busy} onClick={next.go}>{busy ? "Working…" : next.label}</button> : <b style={{ font: `700 15px ${HEAD}` }}>{next.label}</b>}
               </div>
             ) : <div style={{ height: 8 }} />}
           </article>

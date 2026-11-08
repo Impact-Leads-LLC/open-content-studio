@@ -54,7 +54,7 @@ export function LinkedInCard({ body, image }: { body: string; image?: string | n
         <div style={{ whiteSpace: "pre-wrap", fontSize: 14, lineHeight: 1.45 }}>
           {shown}
           {hidden && <span style={{ display: "inline-block", margin: "0 4px", padding: "0 6px", borderRadius: 4, background: C.ink, color: "#fff", font: `700 10px/18px ${HEAD}`, verticalAlign: "middle" }}>SEE MORE FOLD</span>}
-          {hidden && <span style={{ opacity: 0.4 }}>{hidden}</span>}
+          {hidden}
         </div>
         {image && !noImage && <img src={image} alt="" onError={() => setNoImage(true)} style={{ display: "block", width: "calc(100% + 32px)", margin: "12px -16px -14px", borderRadius: "0 0 8px 8px" }} />}
       </div>
