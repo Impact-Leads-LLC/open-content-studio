@@ -9,6 +9,7 @@ import { FIRST_COMMENT, NAME, accountFor, accounts, configured, connection, crea
 import { BOOKING_OFFER, OWNER, bookingUrl } from "../../../../../lib/brand";
 import { pointsToComment, tagGuest } from "../../../../../lib/guests";
 import { episodeExtras } from "../../../../../lib/links";
+import { episodeVideo } from "../../../../../lib/postkit";
 
 export const runtime = "nodejs";
 // a scheduled piece's files are copied to Google Drive after the response (a full episode can take minutes)
@@ -58,11 +59,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       const u = await sign(media.slides, DAY);
       m.images = media.slides.map((s) => u[s]).filter(Boolean);
     } else if (p.kind === "episode") {
-      const { data: full } = await storage().list(`episodes/${p.episode_id}/full`, { limit: 20, sortBy: { column: "created_at", order: "desc" } });
-      const f = (full ?? []).find((x) => x.id && fileKind(x.name) === "clip");
-      if (!f) return Response.json({ error: "Upload the full episode video first." }, { status: 400 });
-      const video = `episodes/${p.episode_id}/full/${f.name}`;
-      const thumb = await frameAt(video, 0.5, `episodes/${p.episode_id}/full/thumbnail-${f.name.replace(/\.[^.]+$/, "")}.jpg`);
+      // the produced edit, a finished episode uploaded, or the one video it was recorded as; the picked thumbnail as its cover
+      const ev = await episodeVideo(p);
+      if (!ev.video) return Response.json({ error: "Add the episode video first (Add the episode video, on the episode page)." }, { status: 400 });
+      const video = ev.video;
+      const thumb = ev.thumb ?? (await frameAt(video, 0.5, `episodes/${p.episode_id}/full/thumbnail-${(video.split("/").pop() ?? "episode").replace(/\.[^.]+$/, "")}.jpg`));
       const u = await sign([video, thumb], DAY);
       Object.assign(m, { video: u[video], cover: u[thumb] });
     }

@@ -5,7 +5,14 @@ export const runtime = "nodejs";
 // A one-time link the browser uses to upload straight to the private bucket. Files never pass through this server.
 export async function POST(req: Request) {
   try {
-    const { name, episodeId, sheetFor, full, feed, postImage } = await req.json();
+    const { name, episodeId, sheetFor, full, feed, postImage, resume } = await req.json();
+    // A fresh token for an upload already under way: the first one lasts two hours, and a big file on a slow line takes longer.
+    if (typeof resume === "string") {
+      if (!/^episodes\/[0-9a-f-]{36}\/(full\/|feeds\/|post-images\/)?\d+-[a-zA-Z0-9._-]+$/.test(resume)) return Response.json({ error: "Bad upload path." }, { status: 400 });
+      const { data, error } = await storage().createSignedUploadUrl(resume);
+      if (error) throw error;
+      return Response.json({ path: resume, token: data.token });
+    }
     if (!name || typeof name !== "string") return Response.json({ error: "Missing file name." }, { status: 400 });
     if (episodeId && !/^[0-9a-f-]{36}$/.test(episodeId)) return Response.json({ error: "Bad episode id." }, { status: 400 });
     if (sheetFor && !/^render-\d+$/.test(sheetFor)) return Response.json({ error: "Bad render id." }, { status: 400 });

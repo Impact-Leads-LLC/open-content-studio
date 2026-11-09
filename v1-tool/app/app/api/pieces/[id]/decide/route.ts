@@ -4,6 +4,8 @@ import { actor } from "../../../../../lib/auth";
 import { COACH, OWNER } from "../../../../../lib/brand";
 
 export const runtime = "nodejs";
+// the pieces the team can take off the board: still with the team, before the owner has them
+const TEAM_DROP = ["concept", "kept", "draft", "changes"];
 
 // Moves between the team and the owner: send (team to the owner), approve, send back, answer the coach's question, or drop the
 // piece (the owner).
@@ -11,15 +13,18 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   try {
     const { id } = await params;
     const { decision, note = "", reasons = [], rule = false } = await req.json();
-    // Only the owner's account approves, sends back, answers the coach or drops a piece; the team can send to the owner.
+    // Only the owner's account approves, sends back or answers the coach. The team can send to the owner, take a piece
+    // off the board before it reaches the owner, and bring back a piece that's off the board.
     const me = actor(req);
     if (!me) return Response.json({ error: "Sign in first." }, { status: 401 });
-    if (decision !== "send" && me.role !== "owner") return Response.json({ error: `Only ${OWNER} can approve, send back, answer ${COACH} or drop a piece.` }, { status: 403 });
     const author = me.name;
     const sb = db();
     const { data, error } = await sb.from("studio_pieces").select("*").eq("id", id).single();
     if (error) throw error;
     const p = data as Piece;
+    const teamOk = decision === "send" || decision === "restore" || (decision === "drop" && TEAM_DROP.includes(p.status));
+    if (!teamOk && me.role !== "owner") return Response.json({ error: `Only ${OWNER} can approve, send back, answer ${COACH} or take off a piece that's with ${OWNER}.` }, { status: 403 });
+    if (decision === "send" && ["approved", "scheduled", "posted"].includes(p.status)) return Response.json({ error: `It's already approved.` }, { status: 400 });
     const meta = { coach_verdict: p.review?.verdict ?? null, score: p.review?.score ?? null, reasons, question: p.review?.question || null };
     const text = String(note).slice(0, 4000);
     let status = p.status, kind = "note", body = text;

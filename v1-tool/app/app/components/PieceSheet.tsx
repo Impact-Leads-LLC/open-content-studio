@@ -11,7 +11,10 @@ import { PLATFORM, LABEL, LIMIT, ownCaptions, platformsFor, channelsFor, chosen,
 import ImagePick from "./ImagePick";
 import { CADENCE, slotStamp, toSlotInput, fromSlotInput } from "../../lib/cadence";
 import { drafting, type ViewPiece } from "../../lib/types";
-import { OWNER, COACH, TZ_LABEL, SCHEDULER_NAME } from "../../lib/brand";
+import { OWNER, COACH, TZ_LABEL, SCHEDULER_NAME, SCHEDULER_ID } from "../../lib/brand";
+
+// a scheduler the app doesn't post to (lib/postkit.ts): pieces go out through the posting kit and get marked scheduled
+const BY_HAND = SCHEDULER_ID === "export";
 
 const REASONS = ["Voice", "Facts", "Hook", "Wrong offer", "Design", "Not worth posting"];
 // The way out, the same four steps for every piece: the team makes it, the coach checks it, the owner signs off, and
@@ -27,7 +30,8 @@ const day = (iso: string) => slotStamp(iso, { weekday: "short", month: "short", 
 // approved it and it has a date; nothing posts until the scheduler has it.
 function stepOf(p: ViewPiece) {
   const cs = p.media?.cs;
-  if (p.status === "posted" || (cs?.mode === "scheduled" && cs.results.some((r) => r.ok))) return 4;
+  // scheduled by the app, or by hand in the member's own tool (the posting kit's "Scheduled it")
+  if (p.status === "posted" || (cs?.mode === "scheduled" && cs.results.some((r) => r.ok)) || p.media?.handoff) return 4;
   if (p.status === "approved" || p.status === "scheduled") return 3;
   if (p.status === "ready") return 2;
   if (p.status === "draft" && !p.review) return 1;
@@ -116,7 +120,7 @@ export default function PieceSheet({ piece, isOwner, onClose, onChanged }: Props
   const moveTo = (at: string) => { setWhen(local(at)); patch({ scheduled_at: at }, "Date saved."); };
   const approve = async () => {
     if (!(await decide("approve"))) return;
-    if (dated) await send("scheduled", false);
+    if (dated && !BY_HAND) await send("scheduled", false);
   };
 
   const step = stepOf(p);
@@ -144,7 +148,8 @@ export default function PieceSheet({ piece, isOwner, onClose, onChanged }: Props
   // The one thing to do next, by whose turn it is.
   let action: ReactNode = null;
   // a reel or carousel goes out with its caption, so it can't be signed off without one
-  const noCaption = (p.kind === "reel" || p.kind === "carousel") && !(p.caption ?? "").trim() && !Object.keys(own).length;
+  const noCaption = (p.kind === "reel" || p.kind === "carousel" || p.kind === "episode") && !(p.caption ?? "").trim() && !Object.keys(own).length;
+  const handoff = () => call(`/api/pieces/${p.id}/handoff`, "POST", { undo: false }, "Marking it scheduled…");
   const moveBtn = nextOpen ? <button style={{ ...btn, minHeight: 52, padding: "0 24px", fontSize: 15 }} disabled={!!busy} onClick={() => moveTo(nextOpen)}>Move to {day(nextOpen)}</button> : null;
   if (isOwner && made && step <= 3 && past && !(step <= 2 && noCaption)) {
     action = (
@@ -165,10 +170,13 @@ export default function PieceSheet({ piece, isOwner, onClose, onChanged }: Props
       <>
         <button style={{ ...ghost, minHeight: 52, padding: "0 22px" }} disabled={!!busy} onClick={() => setBack(true)}>Send back</button>
         <button style={step === 2 ? hot : { ...btn, minHeight: 52, padding: "0 24px", fontSize: 15 }} disabled={!!busy} onClick={approve}>
-          {step === 2 ? (dated ? `Approve and schedule for ${day(p.scheduled_at!)}` : "Approve") : dated ? "Approve as it is and schedule" : "Approve as it is"}
+          {step === 2 ? (dated && !BY_HAND ? `Approve and schedule for ${day(p.scheduled_at!)}` : "Approve") : dated && !BY_HAND ? "Approve as it is and schedule" : "Approve as it is"}
         </button>
       </>
     );
+  } else if (step === 3 && BY_HAND) {
+    // posted by hand: download the posting kit above, schedule it in the member's own tool, then say so here
+    action = <button style={hot} disabled={!!busy} onClick={handoff}>I scheduled it in {SCHEDULER_NAME}</button>;
   } else if (isOwner && step === 3) {
     action = dated
       ? <button style={hot} disabled={!!busy} onClick={() => send("scheduled")}>Schedule in {SCHEDULER_NAME} for {day(p.scheduled_at!)}</button>
@@ -262,7 +270,7 @@ export default function PieceSheet({ piece, isOwner, onClose, onChanged }: Props
 
             {p.kind === "post" && made && <ImagePick p={p} onSave={(image) => patch({ image }, image ? "Image attached." : "Image taken off.")} />}
 
-            {p.kind !== "post" && p.kind !== "episode" && (
+            {p.kind !== "post" && (
               editCap ? (
                 <div style={{ display: "grid", gap: 8 }}>
                   <Caption key={p.id} kind={p.kind} channels={chans} captions={p.captions ?? {}} fallback={p.caption ?? ""} leadMagnetId={p.lead_magnet_id ?? null} busy={!!busy} guest={guest}

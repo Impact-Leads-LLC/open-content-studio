@@ -44,7 +44,7 @@ export async function draftCopy(id: string) {
       return { written: false, building: true };
     } catch (e) {
       // no build: the caption from the slide plan, as before
-      await sb.from("studio_notes").insert({ piece_id: id, author: "Studio", kind: "note", body: `The carousel couldn't start building on its own (${safeError(e)}). Use Make the carousel.` });
+      await sb.from("studio_notes").insert({ piece_id: id, author: "Studio", kind: "note", body: `The carousel couldn't start building on its own (${safeError(e)}). Use Build the carousel.` });
     }
   }
   try {
@@ -67,6 +67,21 @@ export async function draftCopy(id: string) {
     await sb.from("studio_notes").insert({ piece_id: id, author: "Writer", kind: "note", body: `Couldn't write the ${p.kind === "post" ? "post" : "caption"} on my own: ${safeError(e)}${tries >= 2 ? ` Use ${p.kind === "post" ? "Write the post" : "Write it for me"}.` : " I'll try again the next time the episode is opened."}` });
     throw e;
   }
+}
+
+// A claim that ran out of time with no word back (its request was cut off before it could count the failure) counts as
+// a failed try too, so a piece that keeps timing out stops after two and waits for the team's button, instead of
+// showing "Writing…" again every half hour for good. Returns the pieces still worth trying.
+export async function countLost<T extends Row>(rows: T[]) {
+  const sb = db();
+  for (const p of rows.filter((x) => x.copy_since)) {
+    const tries = (p.copy_failed ?? 0) + 1;
+    p.copy_failed = tries;
+    if (tries >= 2) p.copy_since = null;
+    await sb.from("studio_pieces").update({ copy_failed: tries, ...(tries >= 2 ? { copy_since: null } : {}) }).eq("id", p.id);
+    if (tries >= 2) await sb.from("studio_notes").insert({ piece_id: p.id, author: "Writer", kind: "note", body: `Couldn't write the ${p.kind === "post" ? "post" : "caption"} on my own: it ran out of time twice. Use ${p.kind === "post" ? "Write the post" : "Write it for me"}.` });
+  }
+  return rows.filter((p) => (p.copy_failed ?? 0) < 2);
 }
 
 // Claims the pieces that still need their words, so two tabs never write one twice. Only unclaimed pieces (or lost

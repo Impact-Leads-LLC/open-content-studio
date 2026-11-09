@@ -137,11 +137,13 @@ export async function runRetention(opts: { dry?: boolean; now?: number } = {}): 
   }
 
   // 2. Episodes whose every piece went out (and was cleared) or was killed: their footage goes too.
-  const { data: eps, error: e2 } = await sb.from("studio_episodes").select("id, title, archived_at, studio_pieces(id, kind, status, media, scheduled_at)").is("archived_at", null).limit(500);
+  const { data: eps, error: e2 } = await sb.from("studio_episodes").select("id, title, archived_at, studio_pieces(id, kind, status, media, scheduled_at), studio_podcast_episodes(audio_path)").is("archived_at", null).limit(500);
   if (e2) throw e2;
-  for (const ep of (eps ?? []) as unknown as { id: string; title: string; studio_pieces: Row[] }[]) {
+  for (const ep of (eps ?? []) as unknown as { id: string; title: string; studio_pieces: Row[]; studio_podcast_episodes?: { audio_path: string | null }[] }[]) {
     const ps = ep.studio_pieces ?? [];
     if (!ps.length || !ps.every((x) => x.status === "skipped" || (x.status === "posted" && x.media?.retention))) continue;
+    // a podcast episode still waiting for its audio is made from this footage, so it stays until the audio exists
+    if ((ep.studio_podcast_episodes ?? []).some((x) => !x.audio_path)) continue;
     const last = Math.max(...ps.filter((x) => x.scheduled_at).map((x) => Date.parse(x.scheduled_at!)), 0);
     if (!last || last > Date.parse(cutoff)) continue;
     try {

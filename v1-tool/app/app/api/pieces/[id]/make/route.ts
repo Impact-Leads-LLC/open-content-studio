@@ -153,7 +153,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         // a change keeps the reel and the coach's review on screen until the new version lands
         if (change) delete patch.review;
         const changing = change ? { reply: String(opts.revise.reply ?? "").slice(0, 400), at: new Date().toISOString() } : undefined;
-        Object.assign(patch, { status: "making", media: { ...p.media, render: renderId, video: change ? p.media?.video : undefined, render_error: undefined, render_status: "", changing } });
+        // the clip it was made from stays on the reel, so a later change starts from it (an uploaded clip has no cut times)
+        Object.assign(patch, { status: "making", media: { ...p.media, clip: opts.clip, cut: own ? p.media?.cut : undefined, render: renderId, video: change ? p.media?.video : undefined, render_error: undefined, render_status: "", changing } });
       }
     } else if (p.kind === "carousel" && Array.isArray(opts.slides)) {
       if (!opts.slides.length) return Response.json({ error: "Pick the slide images." }, { status: 400 });

@@ -7,7 +7,7 @@ import CoachCard from "../components/CoachCard";
 import Glyph, { Channels } from "../components/Glyph";
 import Dictate from "../components/Dictate";
 import { C, HEAD, VERDICT, STATUS, btn, hot, ghost, link, card, label, chip, input, who, isOwner as ownerSignedIn, changed, kindName, stageText } from "../../lib/ui";
-import { OWNER, COACH, SCHEDULER_NAME } from "../../lib/brand";
+import { OWNER, COACH, SCHEDULER_NAME, SCHEDULER_ID } from "../../lib/brand";
 import { slotStamp } from "../../lib/cadence";
 import { stageLine, isAnimated } from "../../lib/stages";
 import type { ViewPiece } from "../../lib/types";
@@ -91,7 +91,8 @@ export default function Queue() {
     setBusy(true); setErr("");
     const r = await post(p.id, "approve");
     if (r.error) { setBusy(false); return setErr(r.error); }
-    if (dated(p)) {
+    // a scheduler the app doesn't post to: approving is all; the posting kit takes it from there
+    if (dated(p) && SCHEDULER_ID !== "export") {
       const s = await fetch(`/api/pieces/${p.id}/send`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ mode: "scheduled" }) }).then((x) => x.json()).catch(() => ({ error: "Network error" }));
       const bad = ((s.results ?? []) as { ok: boolean; platform: string; error?: string }[]).filter((x) => !x.ok);
       if (s.error) setErr(`#${p.num} is approved, but ${SCHEDULER_NAME} didn't take it: ${s.error} Schedule it from the calendar.`);

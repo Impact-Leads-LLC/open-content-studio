@@ -471,6 +471,16 @@ export async function startEdit(clip: string, engine: string, context: EditConte
   return id;
 }
 
+// How long each kind of job's machine may run (the timeouts given to Sandbox.create above), by its id's prefix.
+const LIMIT_MIN: Record<string, number> = { render: 90, carousel: 45, stack: 60, transcribe: 120, fulledit: 180, animated: 45, thumb: 30, podcast: 60 };
+// A job whose machine is gone and never saved its log: once its time limit is long past, it ran out of time or was
+// shut down. Reporting it failed brings the retry buttons back instead of showing it running forever.
+function lostJob(id: string) {
+  const m = id.match(/^([a-z]+)-(\d{12,})/);
+  if (!m) return false;
+  return Date.now() - Number(m[2]) > ((LIMIT_MIN[m[1]] ?? 180) + 10) * 60000;
+}
+
 // Live status from the machine while it runs; the uploaded timings file once it has stopped.
 export async function renderStatus(id: string): Promise<{ status: string; done: boolean; ok: boolean }> {
   try {
@@ -485,6 +495,7 @@ export async function renderStatus(id: string): Promise<{ status: string; done: 
       const status = await log.data.text();
       return { status, done: true, ok: /^DONE/m.test(status) };
     }
+    if (lostJob(id)) return { status: "FAILED: the cloud machine stopped before it finished (it ran out of time or was shut down). Start it again.\n", done: true, ok: false };
     return { status: "", done: false, ok: false };
   }
 }

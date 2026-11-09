@@ -5,7 +5,7 @@ import { C, btn, input, label } from "../../lib/ui";
 import { OWNER } from "../../lib/brand";
 
 // Back to the page that sent them here, never to another site.
-const nextPath = () => { const n = new URLSearchParams(window.location.search).get("next"); return n && n.startsWith("/") && !n.startsWith("//") ? n : "/"; };
+const nextPath = () => { const n = new URLSearchParams(window.location.search).get("next"); return n && n.startsWith("/") && !n.startsWith("//") && !n.includes("\\") ? n : "/"; };
 
 export default function Login() {
   const [email, setEmail] = useState("");

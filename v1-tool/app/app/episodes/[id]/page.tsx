@@ -175,8 +175,9 @@ export default function Episode() {
   useEffect(() => { if (sel) setChans(chosen(sel.kind, sel.channels, !!sel.media?.image)); }, [sel?.channels?.join(), sel?.media?.image]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Material (transcript, clips, images) or the full episode. Big files go up in resumable pieces with a progress bar.
-  async function upload(files: FileList | null, full = false) {
-    if (!files?.length) return;
+  // Returns false when a file didn't go up, so nothing runs on half the material and the error stays on screen.
+  async function upload(files: FileList | globalThis.File[] | null, full = false) {
+    if (!files?.length) return true;
     setNote("");
     try {
       for (const f of Array.from(files)) {
@@ -185,10 +186,13 @@ export default function Episode() {
       }
       setNote(full ? "Full episode uploaded. Pick a reel to cut its clip." : "Uploaded.");
     } catch (e) {
-      setNote(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      setNote(`Error: ${e instanceof Error ? e.message : String(e)} Nothing else ran. Add the file again.`);
+      setSending(null); load();
+      return false;
     }
     setSending(null);
     if (Array.from(files).some((f) => MEDIA.test(f.name)) && !Array.from(files).some((f) => TEXT.test(f.name))) await transcribe(); else load();
+    return true;
   }
   // Raw video or audio with no transcript, or camera feeds with only a rough one (a Word or text transcript): transcribe
   // it on a cloud machine; the moments are found, or moved to the exact times, when it's done.
@@ -199,8 +203,8 @@ export default function Episode() {
   }
   // Riverside's separate tracks (each person's camera and microphone) plus the .srt: footage goes to the feeds folder,
   // text to the material; then the whole episode gets stacked for the trim player.
-  async function uploadFeeds(files: FileList | null) {
-    if (!files?.length) return;
+  async function uploadFeeds(files: FileList | globalThis.File[] | null) {
+    if (!files?.length) return true;
     setNote("");
     let feeds = 0;
     try {
@@ -211,10 +215,24 @@ export default function Episode() {
         if (!text) feeds++;
       }
     } catch (e) {
-      setNote(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      // stacking or transcribing half the footage would hide the problem: stop here and say what went wrong
+      setNote(`Error: ${e instanceof Error ? e.message : String(e)} Nothing else ran. Add the file again.`);
+      setSending(null); load();
+      return false;
     }
     setSending(null);
     if (feeds) { await restack(); await transcribe(); } else load();
+    return true;
+  }
+  // An episode recorded as one video (Zoom, StreamYard, a phone, an edited export): it goes in as the owner's camera
+  // track, so the app crops it to 9:16, transcribes it, cuts each reel from it and makes the produced episode, the same
+  // as Riverside's separate tracks. Adding it again replaces it.
+  async function uploadEpisode(files: FileList | null) {
+    const f = files?.[0];
+    if (!f) return;
+    const ext = (f.name.match(/\.[a-z0-9]{2,4}$/i)?.[0] ?? ".mp4").toLowerCase();
+    const host = OWNER_FULL.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "host";
+    await uploadFeeds([new globalThis.File([f], `${host}${ext}`, { type: f.type })]);
   }
   const restack = () => call(`/api/episodes/${id}/stack`, "POST", undefined, "Starting the stacked preview of the whole episode…");
   // Camera feeds with only a rough transcript (a Word or text file): the tracks get transcribed on their own, once per
@@ -244,9 +262,9 @@ export default function Episode() {
     const rest = list.filter((f) => !TEXT.test(f.name) && !FEED.test(f.name));
     // The transcript first, so nothing gets transcribed that has one; then the camera tracks, which transcribe each
     // person from their own sound; then the rest (a screen share has no sound, so it's never the one transcribed).
-    if (text.length) await upload(pack(text));
-    if (feedFiles.length) await uploadFeeds(pack(feedFiles));
-    if (rest.length) await upload(pack(rest));
+    if (text.length && !(await upload(pack(text)))) return;
+    if (feedFiles.length && !(await uploadFeeds(pack(feedFiles)))) return;
+    if (rest.length && !(await upload(pack(rest)))) return;
     // A rough transcript on an episode with camera feeds waits for the tracks' own transcript, which finds the moments
     // with exact times; captions (.srt, .vtt) are exact already.
     const roughWithCams = text.length > 0 && !text.some((f) => /\.(srt|vtt)$/i.test(f.name)) && (feedFiles.length > 0 || (d?.feeds.length ?? 0) > 0) && d?.transcribe?.status !== "failed";
@@ -315,6 +333,11 @@ export default function Episode() {
     const r = await call(`/api/pieces/${pid}/revise`, "POST", { instruction, author: who() }, `Rewriting it with ${COACH}'s fixes (about a minute)…`);
     if (r.piece) { setText(r.piece.body ?? ""); setInstr(""); await ask(pid); }
   }
+  // A carousel rebuilt with a note for the designer (the owner's words, or the coach's fixes); the note shows in the box.
+  function rebuild(pid: string, notes: string) {
+    setEnotes(notes);
+    return make(pid, { notes }, "Rebuilding the carousel with the note (about 6 minutes)…");
+  }
   async function useHook(h: string) {
     if (!sel?.body) return;
     const body = [h, ...sel.body.split(/\n\s*\n/).slice(1)].join("\n\n");
@@ -344,7 +367,7 @@ export default function Episode() {
   const cams = d.feeds.filter((p) => p.video).length;
   const bytes = d.files.reduce((a, f) => a + f.size, 0) + d.fulls.reduce((a, f) => a + f.size, 0) + d.feeds.reduce((a, p) => a + (p.video?.size ?? 0) + (p.audio?.size ?? 0), 0);
   const filesLine = [cams ? `${cams} camera${cams > 1 ? "s" : ""}` : "", hasTranscript ? "transcript" : "", clips.length ? `${clips.length} clip${clips.length > 1 ? "s" : ""}` : "", images.length ? `${images.length} image${images.length > 1 ? "s" : ""}` : "", d.fulls.length ? "full episode" : ""].filter(Boolean).join(" · ");
-  const filesText = filesLine ? `${filesLine} · ${mb(bytes)}` : "No files yet. Add Riverside's camera tracks and the transcript, or any video or audio.";
+  const filesText = filesLine ? `${filesLine} · ${mb(bytes)}` : "No files yet. Add the episode video (one file), or Riverside's separate camera tracks and the transcript.";
   // One type of content at a time, sorted by where each piece stands, then the Moment Coach's score; killed ones fold away.
   const tabKind = filter !== "all" ? filter : TABS.map(([k]) => k).find((k) => d.pieces.some((p) => p.kind === k)) ?? "reel";
   const rank = (p: ViewPiece) => GROUPS.findIndex((g) => g.id === groupOf(p.status));
@@ -384,7 +407,7 @@ export default function Episode() {
         {p.status === "kept" && <div style={{ marginTop: "auto" }} onClick={(e) => e.stopPropagation()}><button style={{ ...link, color: C.muted, fontSize: 13 }} onClick={() => patch(p.id, { status: "concept" })}>Undo keep</button></div>}
         {p.status === "skipped" && (
           <div style={{ marginTop: "auto" }} onClick={(e) => e.stopPropagation()}>
-            <button style={{ ...ghost, width: "100%", minHeight: 38 }} disabled={!!busy} onClick={() => (wasMade(p) ? decide(p.id, "restore") : patch(p.id, { status: "concept" }))}>Bring it back</button>
+            <button style={{ ...ghost, width: "100%", minHeight: 38 }} disabled={!!busy} onClick={() => decide(p.id, "restore")}>Bring it back</button>
           </div>
         )}
       </article>
@@ -426,7 +449,10 @@ export default function Episode() {
   const next: Next | null = !sel || sel.kind === "episode" || sel.status === "skipped" ? null : (() => {
     const s = sel.status, r = sel.review;
     if (s === "making") return { label: sel.kind === "carousel" ? "Building on a cloud machine" : "Rendering on a cloud machine", note: `About 10 minutes. ${COACH} reviews it when it lands.` };
-    if (s === "ready") return { label: `With ${OWNER}`, note: `Nothing to do until ${OWNER} decides.`, alt: { label: "Pull back to edit", go: () => patch(sel.id, { status: "draft" }) } };
+    if (s === "posted") return { label: "Posted", note: "It went out. Nothing more to do here." };
+    if (s === "ready") return isOwner()
+      ? { label: "Approve it in your queue", go: () => { window.location.href = "/queue"; }, note: `${COACH} is done with it. Approve it or send it back from your queue.`, alt: { label: "Pull back to edit", go: () => patch(sel.id, { status: "draft" }) } }
+      : { label: `With ${OWNER}`, note: `Nothing to do until ${OWNER} decides.`, alt: { label: "Pull back to edit", go: () => patch(sel.id, { status: "draft" }) } };
     if (s === "approved" || s === "scheduled") return { label: s === "scheduled" ? "Scheduled" : `Approved by ${OWNER}`, note: `Send it to ${SCHEDULER_NAME} below.` };
     if (!made) {
       // Keeping a reel makes it: cut from the camera feeds, then the editor ("keep it" means make the reel)
@@ -441,8 +467,13 @@ export default function Episode() {
     }
     if (fresh(sel)) return sel.kind === "post" && sel.body ? { label: `Rewrite with ${OWNER}'s answer`, go: () => fix(sel.id, `Work ${OWNER}'s answer in as their take, in their own words.`) }
       : sel.kind === "reel" ? { label: `Work in ${OWNER}'s answer`, go: () => openChanges("own", `Work in ${OWNER}'s answer as their take, in their own words: "${sel.answer!.body}"`), note: `${OWNER}'s answer goes into Your own edits. Say where it should go, then make the change.` }
-      : { label: `Work in ${OWNER}'s answer`, note: `Put ${OWNER}'s words in the ${OWNER}'s take slide, then ask ${COACH} again.` };
+      : sel.kind === "carousel" ? { label: `Rebuild with ${OWNER}'s answer`, go: () => rebuild(sel.id, `${OWNER}'s answer to ${COACH}'s question, to work in as their take, in their own words: "${sel.answer!.body}"`), note: `The builder works ${OWNER}'s words into the deck, then ${COACH} reviews it again.` }
+      : { label: `Work in ${OWNER}'s answer`, note: `Put ${OWNER}'s words in, then ask ${COACH} again.` };
     if (sel.kind === "reel" && s === "changes" && sentBack) return { label: `Make ${OWNER}'s changes`, go: () => openChanges("own", sentBack.body), note: `${OWNER} sent it back. The note goes into Your own edits; add to it if you need to.` };
+    // sent back since the coach last looked: the owner's note is the work, whatever the old review said
+    const backFresh = s === "changes" && !!sentBack && (!r || new Date(sentBack.created_at) > new Date(r.at));
+    if (backFresh && sel.kind === "post" && sel.body) return { label: `Rewrite with ${OWNER}'s note`, go: () => fix(sel.id, `${OWNER} sent it back with this note. Make the change: "${sentBack!.body}"`), note: `${OWNER} sent it back. The writer makes the change, then ${COACH} reviews it again. Or change it yourself with Edit text.` };
+    if (backFresh && sel.kind === "carousel") return { label: `Rebuild with ${OWNER}'s note`, go: () => rebuild(sel.id, `${OWNER} sent it back with this note. Make the change: "${sentBack!.body}"`), note: `${OWNER} sent it back. The builder makes the change, then ${COACH} reviews it again.` };
     if (!r) return autoReview(sel) ? { label: `${COACH} is reviewing it`, note: "A minute or two." } : { label: `Ask ${COACH}`, go: () => ask(sel.id) };
     if (r.verdict === "ready") return { label: `Send to ${OWNER}`, go: () => decide(sel.id, "send"), note: `${COACH}: ready, ${r.score}/100.` };
     // the coach's question, when it asked one, waits in the owner's queue
@@ -485,12 +516,14 @@ export default function Episode() {
         {/* one way in for every file; the pickers stay mounted so the reel steps can open them */}
         <input id="up" type="file" multiple hidden disabled={!!sending} onChange={(e) => { addFiles(e.target.files); e.target.value = ""; }} />
         <input id="feeds" type="file" multiple hidden accept="video/*,audio/*,.srt,.vtt,.txt,.docx" disabled={!!sending} onChange={(e) => { addFiles(e.target.files); e.target.value = ""; }} />
+        <input id="epvideo" type="file" hidden accept="video/*" disabled={!!sending} onChange={(e) => { uploadEpisode(e.target.files); e.target.value = ""; }} />
         {!sel && (
           <>
             {/* Files: one strip; the list and its Remove links sit in a drawer */}
             <div style={{ ...card, padding: "10px 14px", marginBottom: 12, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
               <Glyph kind="episode" size={18} />
               <span style={{ fontSize: 13.5, color: C.text, flex: "1 1 240px" }}>{filesText}</span>
+              {!idea && !d.feeds.some((p) => p.video) && <label htmlFor="epvideo" style={{ ...btn, minHeight: 38 }}>Add the episode video</label>}
               <label htmlFor="up" style={{ ...ghost, minHeight: 38 }}>Add files</label>
               {hasTranscript && <button style={{ ...ghost, minHeight: 38 }} disabled={!!busy || isRunning(d.episode.moments)} onClick={() => call(`/api/episodes/${id}/concepts`, "POST", undefined, "Starting the Moment Coach…")}>{isRunning(d.episode.moments) ? "Finding the moments…" : d.pieces.length ? "Find more moments" : "Find the moments"}</button>}
               <button style={{ ...link, fontSize: 13 }} onClick={() => setFilesOpen(!filesOpen)}>{filesOpen ? "Hide the files" : "Files"}</button>
@@ -700,7 +733,7 @@ export default function Episode() {
                     </div>
                   );
                 })()}
-                {sel.status === "skipped" && (notes.some((n) => n.kind === "drop") || wasMade(sel)) && (
+                {sel.status === "skipped" && (
                   <div style={{ background: C.soft, borderRadius: 6, padding: "12px 14px", display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", font: `600 14px/1.4 ${HEAD}` }}>
                     <span style={{ flex: 1 }}>This piece is off the board. No more work on it.</span>
                     <button style={ghost} disabled={!!busy} onClick={() => decide(sel.id, "restore")}>Bring it back</button>
@@ -715,7 +748,8 @@ export default function Episode() {
                       {sel.kind === "post" && sel.body
                         ? <button style={{ ...btn, justifySelf: "start" }} disabled={!!busy} onClick={() => fix(sel.id, `Work ${OWNER}'s answer in as their take, in their own words.`)}>Rewrite with {OWNER}&apos;s answer</button>
                         : sel.kind === "reel" ? <button style={{ ...btn, justifySelf: "start" }} disabled={!!busy} onClick={() => openChanges("own", `Work in ${OWNER}'s answer as their take, in their own words: "${sel.answer!.body}"`)}>Work it in</button>
-                        : <p style={{ margin: 0, fontSize: 13, color: C.text, lineHeight: 1.5 }}>Put {OWNER}&apos;s words in the {OWNER}&apos;s take slide, then ask {COACH} again.</p>}
+                        : sel.kind === "carousel" ? <button style={{ ...btn, justifySelf: "start" }} disabled={!!busy} onClick={() => rebuild(sel.id, `${OWNER}'s answer to ${COACH}'s question, to work in as their take, in their own words: "${sel.answer!.body}"`)}>Rebuild with {OWNER}&apos;s answer</button>
+                        : <p style={{ margin: 0, fontSize: 13, color: C.text, lineHeight: 1.5 }}>Put {OWNER}&apos;s words in, then ask {COACH} again.</p>}
                     </div>
                   </div>
                 )}
@@ -757,6 +791,21 @@ export default function Episode() {
 
                 {sel.kind === "post" && !sel.body && drafting(sel) && <div style={{ fontSize: 13.5, color: C.text, lineHeight: 1.5 }}>The writer is drafting this post with the LinkedIn skill, then {COACH} gives it a first look. It shows here in a few minutes.</div>}
                 {canMake && sel.kind === "post" && !sel.body && !drafting(sel) && <button style={btn} disabled={!!busy} onClick={() => make(sel.id, {}, "Writing the post with the LinkedIn skill (about a minute)…")}>Write the post</button>}
+                {/* when the writer can't run (or the team would rather), the post can be typed in by hand */}
+                {sel.kind === "post" && !sel.body && !drafting(sel) && sel.status !== "skipped" && (
+                  <div style={{ display: "grid", gap: 10 }}>
+                    <button style={{ ...link, justifySelf: "start" }} onClick={() => setEdit(!edit)}>{edit ? "Close the editor" : "Or write it yourself"}</button>
+                    {edit && <>
+                      <textarea value={text} onChange={(e) => setText(e.target.value)} rows={14} style={area} placeholder="The post, as it should go out" />
+                      <button style={{ ...btn, justifySelf: "start" }} disabled={!text.trim() || !!busy} onClick={() => patch(sel.id, { body: text, status: "draft" })}>Save the post</button>
+                    </>}
+                  </div>
+                )}
+                {sel.kind === "carousel" && sel.media?.render_error && sel.status !== "making" && (
+                  <div style={{ borderRadius: 6, border: `1.5px solid ${C.warn}`, padding: "10px 14px", fontSize: 13.5, lineHeight: 1.5 }}>
+                    <b style={{ fontFamily: HEAD }}>The last build didn&apos;t go through.</b> {sel.media.slides?.length ? "These are the slides from before. " : ""}{sel.media.render_status?.split("\n").filter(Boolean).slice(-2).join(" ")} Build it again below.
+                  </div>
+                )}
                 {selAnim && !made && (
                   <div style={{ display: "grid", gap: 10 }}>
                     <div style={{ borderRadius: 6, background: C.soft, padding: "12px 14px", fontSize: 13.5, lineHeight: 1.5 }}>
@@ -816,13 +865,18 @@ export default function Episode() {
                             ) : (
                             <div style={{ display: "grid", gap: 10, padding: 16, borderRadius: 6, border: `1.5px dashed ${C.navy}`, background: "#fbfcfd" }}>
                               <div style={{ display: "flex", gap: 8, alignItems: "center", font: `800 15px ${HEAD}` }}><Glyph kind="episode" size={18} /> Cut this moment straight from the episode</div>
-                              <p style={{ margin: 0, fontSize: 13, color: C.text, lineHeight: 1.5 }}>Add the camera feeds from Riverside&apos;s separate tracks (each person&apos;s camera and microphone, plus the .srt). The app stacks them into 9:16, and every reel idea here opens on its moment, ready to trim and cut.</p>
+                              <p style={{ margin: 0, fontSize: 13, color: C.text, lineHeight: 1.5 }}>Add the episode as one video (Zoom, StreamYard, a phone or an edited export), or Riverside&apos;s separate tracks (each person&apos;s camera and microphone, plus the .srt). The app crops it to 9:16, and every reel idea here opens on its moment, ready to trim and cut.</p>
                               {sending ? (
                                 <div style={{ display: "grid", gap: 6 }}>
                                   <div style={{ fontSize: 12.5, color: C.muted }}>Uploading {mb(sending.done)} of {mb(sending.total)}. Keep this tab open.</div>
                                   <div style={{ height: 8, borderRadius: 4, background: C.line, overflow: "hidden" }}><div style={{ height: "100%", width: `${sending.total ? (sending.done / sending.total) * 100 : 0}%`, background: C.navy, transition: "width .3s" }} /></div>
                                 </div>
-                              ) : <label htmlFor="feeds" style={{ ...btn, justifySelf: "start" }}>Add the camera feeds</label>}
+                              ) : (
+                                <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
+                                  <label htmlFor="epvideo" style={btn}>Add the episode video</label>
+                                  <label htmlFor="feeds" style={link}>Add Riverside&apos;s tracks</label>
+                                </div>
+                              )}
                             </div>
                             )}
                           </>
@@ -935,9 +989,10 @@ export default function Episode() {
                     onWrite={async () => { if (JSON.stringify(chans) !== JSON.stringify(sel.channels ?? [])) await patch(sel.id, { channels: chans }); await call(`/api/pieces/${sel.id}/caption`, "POST", {}, `Writing the caption from what's said in the moment, then ${COACH}'s first look (about two minutes)…`); }} />
                 )}
 
-                {["draft", "changes"].includes(sel.status) && sel.review && sel.review.verdict !== "ready" && (
+                {/* the team's way past the coach: a review that didn't pass, or no review at all (the coach couldn't run) */}
+                {["draft", "changes"].includes(sel.status) && sel.review?.verdict !== "ready" && !autoReview(sel) && (
                   <details style={{ borderTop: `1px solid ${C.line}`, paddingTop: 14 }}>
-                    <summary style={{ ...link, display: "inline", fontSize: 13 }}>Send it to {OWNER} without a pass</summary>
+                    <summary style={{ ...link, display: "inline", fontSize: 13 }}>Send it to {OWNER} {sel.review ? "without a pass" : `without ${COACH}'s review`}</summary>
                     <div style={{ display: "grid", gap: 10, marginTop: 10 }}>
                       <p style={{ margin: 0, fontSize: 13, color: C.text, lineHeight: 1.5 }}>Say why. {OWNER} sees your note next to {COACH}&apos;s review.</p>
                       <div style={{ display: "flex", gap: 8 }}>
@@ -957,6 +1012,32 @@ export default function Episode() {
                     <p style={{ margin: 0, fontSize: 12, color: C.muted }}>A date is a plan. It goes out only after {OWNER} approves it.</p>
                   </div>
                 )}
+                {/* the team can take a piece off the board until the owner has it; the owner, any time before it's posted */}
+                {sel.kind !== "episode" && (["kept", "draft", "changes"].includes(sel.status) || (isOwner() && ["ready", "approved", "scheduled"].includes(sel.status))) && (
+                  <button style={{ ...link, color: C.muted, fontSize: 13, justifySelf: "start", alignSelf: "start" }} disabled={!!busy} onClick={() => { if (window.confirm("Take this piece off the board? It moves to Killed, where you can bring it back.")) decide(sel.id, "drop"); }}>Take it off the board</button>
+                )}
+                {/* the full episode: its description, and the way to the owner when the produced edit isn't how it gets there */}
+                {sel.kind === "episode" && (() => {
+                  const hasVideo = d.fulls.length > 0 || !!sel.media?.video || d.feeds.filter((p) => p.video).length === 1;
+                  return (
+                    <div style={{ display: "grid", gap: 16 }}>
+                      <div style={{ display: "grid", gap: 6 }}>
+                        <div style={label}>The description</div>
+                        <Caption key={sel.id} kind={sel.kind} channels={chans} onChannels={(c) => { setChans(c); patch(sel.id, { channels: c }); }} captions={sel.captions ?? {}} fallback={sel.caption ?? ""} leadMagnetId={sel.lead_magnet_id ?? null} busy={!!busy} writing={drafting(sel)} guest={guest}
+                          onSave={(own, shared) => patch(sel.id, { captions: own, caption: shared, channels: chans })}
+                          onLeadMagnet={(lm) => patch(sel.id, { lead_magnet_id: lm })}
+                          onWrite={async () => { if (JSON.stringify(chans) !== JSON.stringify(sel.channels ?? [])) await patch(sel.id, { channels: chans }); await call(`/api/pieces/${sel.id}/caption`, "POST", {}, `Writing the description, then ${COACH}'s first look (about two minutes)…`); }} />
+                      </div>
+                      {["kept", "draft", "changes"].includes(sel.status) && (
+                        <div style={{ borderTop: `1px solid ${C.line}`, paddingTop: 14, display: "grid", gap: 8 }}>
+                          <div style={label}>Send it to {OWNER}</div>
+                          <p style={{ margin: 0, fontSize: 13, color: C.text, lineHeight: 1.5 }}>{hasVideo ? `The produced edit goes to ${OWNER} on its own when it's done. To send the episode as it is now, with its description, use this.` : "Add the episode video first, on the episode page."}</p>
+                          <button style={{ ...btn, justifySelf: "start" }} disabled={!!busy || !hasVideo} onClick={() => decide(sel.id, "send")}>Send to {OWNER}</button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
                 {sel.kind === "episode" && <FullEdit key={d.full_edit?.at ?? "none"} feeds={d.feeds} edit={d.full_edit} latest={d.fulls[0] ?? null} busy={!!busy}
                   onStart={(start, end, notes) => call(`/api/episodes/${id}/edit`, "POST", { start, end, notes }, "Starting the produced episode on a cloud machine…")} />}
                 {sel.kind === "episode" && <Thumbnail key={d.episode.id} episodeId={d.episode.id} isOwner={isOwner()} />}
@@ -989,8 +1070,9 @@ export default function Episode() {
             {/* the one button that moves it forward, always in reach */}
             {sel && next ? (
               <div style={{ position: "sticky", bottom: 0, margin: "4px -26px 0", padding: "12px 26px", background: "#fff", borderTop: `1px solid ${C.line}`, borderRadius: "0 0 6px 6px", display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap", boxShadow: "0 -10px 24px rgba(11,27,39,0.07)", zIndex: 5 }}>
-                <span style={{ flex: "1 1 260px", fontSize: 12.5, color: C.text, lineHeight: 1.45 }}>{busy || next.note}</span>
-                {next.alt && <button style={{ ...link, fontSize: 13 }} onClick={next.alt.go}>{next.alt.label}</button>}
+                {/* what's happening, or what went wrong with the last click, right next to the button */}
+                <span style={{ flex: "1 1 260px", fontSize: 12.5, color: !busy && note.startsWith("Error") ? C.warn : C.text, fontWeight: !busy && note.startsWith("Error") ? 600 : 400, lineHeight: 1.45 }}>{busy || (note.startsWith("Error") ? note : next.note)}</span>
+                {next.alt && <button style={{ ...link, fontSize: 13 }} disabled={!!busy} onClick={next.alt.go}>{next.alt.label}</button>}
                 {next.go ? <button style={{ ...btn, minHeight: 48, padding: "0 24px" }} disabled={!!busy} onClick={next.go}>{busy ? "Working…" : next.label}</button> : <b style={{ font: `700 15px ${HEAD}` }}>{next.label}</b>}
               </div>
             ) : <div style={{ height: 8 }} />}

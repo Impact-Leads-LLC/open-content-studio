@@ -23,7 +23,9 @@ export type ViewPiece = {
   awareness?: string | null; funnel?: string | null; insight?: string | null;
   media: { animated?: boolean; render?: string; rendered?: string; cover?: string; image?: string; card?: { line: string; look: string; at: string }; drive?: DriveSave; cs?: { at: string; mode: string; results: { platform: string; account?: string; ok: boolean; post_id?: string; url?: string; warning?: string; error?: string; status?: string; detail?: string }[] }; render_status?: string; render_error?: boolean; reviewing_since?: string; changing?: { reply: string; at: string }; plan?: string; video?: string; sheet?: string; clip?: string; cut?: { source: string; start: number; end: number; width: number; height: number }; slides?: string[]; usage?: { input: number; output: number }; no_collab?: boolean;
     // set by the daily cleanup (lib/retention.ts) once a posted piece's files are cleared
-    retention?: { at: string; removed: string[]; drive?: string | null } };
+    retention?: { at: string; removed: string[]; drive?: string | null };
+    // scheduled by hand in another tool through the posting kit (lib/postkit.ts)
+    handoff?: { at: string; by: string; tool: string } };
   channels: string[]; scheduled_at: string | null; image_url?: string | null; video_url?: string | null; cover_url?: string | null; sheet_url?: string | null; clip_url?: string | null; slide_urls?: string[]; studio_episodes?: { title: string; guest: string | null; guest_handles?: Handles | null; link?: string | null; kind?: string | null };
   answer?: { body: string; author: string; at: string } | null;
 };

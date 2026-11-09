@@ -7,7 +7,8 @@ import { OWNER } from "../../../../lib/brand";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 300;
+// a finished render writes its caption and gets the coach's review after the response, which can take most of this
+export const maxDuration = 800;
 
 const EDITABLE = ["status", "scheduled_at", "channels", "body", "title", "hook", "caption", "captions", "lead_magnet_id", "editor_notes", "outline"] as const;
 

@@ -72,11 +72,14 @@ export async function addConcepts(id: string, opts: { dry?: boolean } = {}) {
     if (p) await sb.from("studio_pieces").update({ awareness: r.awareness, funnel: FUNNEL_OF[r.awareness] }).eq("id", p.id);
   }
 
-  let num = Math.max(0, ...(existing.data ?? []).map((p) => p.num));
+  // the numbers as they are now: someone may have added a piece by hand during the run, and two pieces can't share one
+  const { data: nums } = await sb.from("studio_pieces").select("num").eq("episode_id", id);
+  let num = Math.max(0, ...(existing.data ?? []).map((p) => p.num), ...(nums ?? []).map((p) => p.num as number));
   const rows = [];
   // Every row carries the same keys: a bulk insert fills missing keys with null, not the column default (so media is
   // always given; {} is its default).
-  if (!num && !idea) rows.push({ episode_id: id, num: ++num, kind: "episode", title: `${ep.title} (full episode)`, hook: null, source_time: "00:00", source_end: null, why: null, outline: null, editor_notes: null, lead_magnet_id: null, moment: null, awareness: null, funnel: null, insight: null, media: {}, status: "kept" });
+  // the full-episode piece comes first, even when someone added a piece by hand before the moments were found
+  if (!idea && !(existing.data ?? []).some((p) => p.kind === "episode")) rows.push({ episode_id: id, num: ++num, kind: "episode", title: `${ep.title} (full episode)`, hook: null, source_time: "00:00", source_end: null, why: null, outline: null, editor_notes: null, lead_magnet_id: null, moment: null, awareness: null, funnel: null, insight: null, media: {}, status: "kept" });
   for (const p of found.picks) rows.push({ episode_id: id, num: ++num, kind: p.kind, title: p.title, hook: p.hook, source_time: p.source_time, source_end: p.source_end, why: p.why, outline: p.outline, editor_notes: p.editor_notes, lead_magnet_id: p.lead_magnet_id, moment: p.moment, awareness: p.awareness, funnel: p.funnel, insight: p.insight, media: p.animated ? { animated: true } : {}, status: "concept" });
   const restaged = found.restaged.length;
   if (!rows.length) return { added: 0, ids: [] as string[], picks: 0, rejected: found.rejected.length, gaps: found.gaps, candidates: found.candidates, usage: found.usage, restaged, report: found.report };

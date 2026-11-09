@@ -6,6 +6,11 @@ and captions for every network, makes the post graphics and the YouTube thumbnai
 own standard, and schedules what you approve. Everything it writes comes from your brain: your brand brief, your voice,
 your offers, your proof and your teaching.
 
+An episode goes in as one video (Zoom, StreamYard, a phone or an edited export: **Add the episode video** on the
+episode page) or as Riverside's separate tracks (each person's camera and microphone, with **Add files**). Either way
+it's transcribed, cropped to 9:16 for reels, and made into the produced full episode. Separate tracks also tell the
+speakers apart; one video credits every line to you.
+
 It runs on your own Supabase project and your own Vercel account. Nothing is shared with anyone else's studio.
 
 ## What it does

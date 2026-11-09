@@ -12,7 +12,8 @@ set -euo pipefail
 HERE=$(cd "$(dirname "$0")/.." && pwd)
 ENV="$HERE/.env.local"
 touch "$ENV"; chmod 600 "$ENV"
-get() { grep -E "^$1=" "$ENV" | tail -1 | cut -d= -f2- | sed -E 's/^"(.*)"$/\1/'; }
+# a name with no line in the file is empty, not an error (set -e would end the script on grep's no-match)
+get() { { grep -E "^$1=" "$ENV" || true; } | tail -1 | cut -d= -f2- | sed -E 's/^"(.*)"$/\1/'; }
 set_var() {
   local name=$1 value=$2 tmp
   tmp=$(mktemp)

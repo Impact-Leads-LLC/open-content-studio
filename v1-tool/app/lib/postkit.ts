@@ -1,4 +1,5 @@
-import { storage, fileKind } from "./supabase";
+import { db, storage, fileKind } from "./supabase";
+import { episodeFeeds, people } from "./feeds";
 import { frameAt, coverPath } from "./render";
 import { LABEL, LIMIT, captionFor, fitCaption, paras, platformsFor, type Platform } from "./platforms";
 import { BOOKING_OFFER, bookingUrl } from "./brand";
@@ -29,22 +30,40 @@ async function links(files: { path: string; name: string; kind: KitFile["kind"] 
   return out;
 }
 
+// The full episode's video: the newest finished episode in full/ (the produced edit lands there), the piece's own video,
+// or, for an episode recorded as one video, its only camera file. Its cover: the thumbnail picked in the Thumbnail panel.
+export async function episodeVideo(p: Piece) {
+  const { data: full } = await storage().list(`episodes/${p.episode_id}/full`, { limit: 20, sortBy: { column: "created_at", order: "desc" } });
+  const f = (full ?? []).find((x) => x.id && fileKind(x.name) === "clip");
+  let video = f ? `episodes/${p.episode_id}/full/${f.name}` : p.media?.video ?? null;
+  if (!video) {
+    const cams = people(await episodeFeeds(p.episode_id)).filter((x) => x.video);
+    if (cams.length === 1) video = cams[0].video!.path;
+  }
+  const thumb = (p.media as { thumb?: { picked?: { path?: string } | null } } | undefined)?.thumb?.picked?.path ?? null;
+  return { video, thumb };
+}
+
 export async function postingKit(p: Piece, secs = 7 * 86400) {
   const m = { ...p.media };
   const base = `${String(p.num).padStart(2, "0")}-${slug(p.title)}`;
   const files: { path: string; name: string; kind: KitFile["kind"] }[] = [];
   if (p.kind === "reel" && m.video) {
-    const cover = m.cover ?? (await frameAt(m.video, 0.5, m.render ? coverPath(m.render) : m.video.replace(/\.mp4$/, "-cover.jpg")));
+    // a reel with no cover gets one from its first half-second, saved so the next kit doesn't start a machine again
+    let cover = m.cover;
+    if (!cover) {
+      cover = await frameAt(m.video, 0.5, m.render ? coverPath(m.render) : m.video.replace(/\.mp4$/, "-cover.jpg"));
+      await db().from("studio_pieces").update({ media: { ...m, cover } }).eq("id", p.id);
+    }
     files.push({ path: m.video, name: `${base}.${ext(m.video, "mp4")}`, kind: "video" }, { path: cover, name: `${base}-cover.${ext(cover, "jpg")}`, kind: "cover" });
   } else if (p.kind === "carousel" && m.slides?.length) {
     m.slides.forEach((s, i) => files.push({ path: s, name: `${base}-slide-${String(i + 1).padStart(2, "0")}.${ext(s, "png")}`, kind: "slide" }));
   } else if (p.kind === "post" && m.image) {
     files.push({ path: m.image, name: `${base}.${ext(m.image, "png")}`, kind: "image" });
   } else if (p.kind === "episode") {
-    const { data: full } = await storage().list(`episodes/${p.episode_id}/full`, { limit: 20, sortBy: { column: "created_at", order: "desc" } });
-    const f = (full ?? []).find((x) => x.id && fileKind(x.name) === "clip");
-    const video = m.video ?? (f ? `episodes/${p.episode_id}/full/${f.name}` : null);
+    const { video, thumb } = await episodeVideo(p);
     if (video) files.push({ path: video, name: `${base}.${ext(video, "mp4")}`, kind: "video" });
+    if (thumb) files.push({ path: thumb, name: `${base}-thumbnail.${ext(thumb, "jpg")}`, kind: "cover" });
   }
   const { guest, link } = await episodeExtras(p.episode_id);
   const chapters = p.kind === "episode" && m.chapters ? await storage().download(String(m.chapters)).then(async (f) => (f.data ? (await f.data.text()).trim().slice(0, 3000) : "")).catch(() => "") : "";

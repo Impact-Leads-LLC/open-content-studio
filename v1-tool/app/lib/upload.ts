@@ -26,7 +26,7 @@ export async function uploadFile(file: File, opts: { episodeId?: string; full?: 
   const made = await fetch(r.tus, { method: "POST", headers: { ...head, "Upload-Length": String(file.size), "Upload-Metadata": meta } });
   if (made.status !== 201) await fail(made, "Couldn't start the upload");
   const at = new URL(made.headers.get("Location") ?? "", r.tus).toString();
-  let off = 0, tries = 0;
+  let off = 0, tries = 0, renewed = 0;
   onProgress?.(0, file.size);
   while (off < file.size) {
     const p = await fetch(at, { method: "PATCH", headers: { ...head, "Upload-Offset": String(off), "Content-Type": "application/offset+octet-stream" }, body: file.slice(off, off + CHUNK) }).catch(() => null);
@@ -35,6 +35,17 @@ export async function uploadFile(file: File, opts: { episodeId?: string; full?: 
       tries = 0;
       onProgress?.(off, file.size);
       continue;
+    }
+    // The upload's token lasts two hours: a big file on a slow line gets a fresh one for the same file and carries on.
+    if (p && [401, 403].includes(p.status) && renewed < 5) {
+      const t = await fetch("/api/upload-url", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ resume: r.path }) }).then((x) => x.json()).catch(() => null);
+      if (t?.token) {
+        head["x-signature"] = t.token; renewed++;
+        const h = await fetch(at, { method: "HEAD", headers: head }).catch(() => null);
+        const o = h?.headers.get("Upload-Offset");
+        if (o) off = Number(o);
+        continue;
+      }
     }
     // A refused or expired upload can't be resumed; anything else (a dropped connection, an offset mismatch) can.
     if (p && [401, 403, 404, 410, 413].includes(p.status)) await fail(p, "Upload stopped");

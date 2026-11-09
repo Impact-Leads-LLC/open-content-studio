@@ -172,7 +172,9 @@ Check: `brain-material/` holds their brief documents, their material, and a list
 5. **The app's keys.** `cp app/.env.example app/.env.local` (you can do this one: it's the template). They open
    `app/.env.local` in their editor and fill in `SUPABASE_URL` (Project Settings > API) and
    `SUPABASE_SERVICE_ROLE_KEY` (Project Settings > API Keys: the **secret** key, `sb_secret_...`). Check with
-   `node app/scripts/check-env.mjs`.
+   `node app/scripts/check-env.mjs`: at this point only `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` need to show as
+   set. The others are filled in later in this part and in Parts 4 and 5, so it still exits with MISSING; that's expected
+   here.
 6. **Load the brain** (skip if their own brain passed in Part 2). From `app/`:
    - their brief: `node scripts/brain.mjs doc ../brain-material/brief/brand-brief.md --type brand-foundation --brief 1`,
      then `voice.md --type voice --brief 2`, `voice-guardrails.md --type voice --brief 3`,
@@ -182,7 +184,8 @@ Check: `brain-material/` holds their brief documents, their material, and a list
    - their photos (`photo ... --expression --setting --topics --side --hooks`) and assets (`asset ... --kind`).
    Check: `node scripts/brain.mjs list` shows the five brief documents with `[brief n]`, the five process documents,
    their material and their photos.
-7. **The brain connector.** Run `bash app/scripts/secrets.sh new BRAIN_MCP_TOKEN` (makes a random token in
+7. **The brain connector** (skip if their own brain passed in Part 2: these commands would point the studio at the
+   kit's empty brain instead of theirs). Run `bash app/scripts/secrets.sh new BRAIN_MCP_TOKEN` (makes a random token in
    `app/.env.local` without showing it), then `bash app/scripts/secrets.sh supabase <ref>` (sets the function's
    `STUDIO_BRAIN_TOKENS` to the same token), then deploy:
    `npx --yes supabase@2.119.0 functions deploy studio-brain --no-verify-jwt --project-ref <ref>`
@@ -272,7 +275,12 @@ dry run that answers.
      voice and the graphic's colours.
    - Keep one carousel: it builds on a cloud machine (about six minutes), then gets its caption. This proves the
      engines, the brain and Sandbox work together.
-   - Send the post to the scheduler **as a draft** and find it there.
+   - With ContentStudio or Metricool: send the post to the scheduler **as a draft** and find it there. With any other
+     scheduler (`SCHEDULER=export`): approve the post, open its posting kit, download its files and caption, and
+     download the calendar's CSV. Then mark it scheduled with "I scheduled it".
+   - Optional: upload an episode recorded as one video with **Add the episode video** on the episode page (Zoom,
+     StreamYard or a phone recording; Riverside's separate tracks go in with Add files). It's transcribed and cropped
+     to 9:16 on its own.
    - Optional, longer: upload a short episode (video and transcript), find the moments and make one reel (about ten
      minutes).
 3. Anything failing: the piece's thread names the step and the reason. Common ones:

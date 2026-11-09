@@ -16,7 +16,7 @@ const andList = (xs: string[]) => (xs.length < 2 ? xs.join("") : `${xs.slice(0, 
 const RHYTHM = `up to ${COUNT[SLOTS.hours.length] ?? SLOTS.hours.length} a day (${andList(SLOTS.hours.map(hourText))} ${TZ_LABEL})`;
 const EPISODE_SLOT = `on ${DAY_NAMES[SLOTS.episodeDay]} at ${hourText(SLOTS.episodeHour)}`;
 // "scheduled" in the app means the owner approved it and it has a date; it only says Scheduled once the scheduler has it
-const stateLabel = (p: ViewPiece) => (p.status === "scheduled" && !(p.media?.cs?.mode === "scheduled" && p.media.cs.results.some((r) => r.ok)) ? "Approved" : STATUS[p.status]?.label);
+const stateLabel = (p: ViewPiece) => (p.status === "scheduled" && !(p.media?.cs?.mode === "scheduled" && p.media.cs.results.some((r) => r.ok)) && !p.media?.handoff ? "Approved" : STATUS[p.status]?.label);
 const weekOf = (d: Date) => { const s = new Date(d); s.setHours(0, 0, 0, 0); s.setDate(s.getDate() - s.getDay()); return s; };
 const short = (d: Date) => d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 const APPROVED = ["approved", "scheduled", "posted"];

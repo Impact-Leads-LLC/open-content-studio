@@ -9,7 +9,7 @@ import { feedOf, people, type Feed } from "../../../../lib/feeds";
 import { claimRun, runConcepts } from "../../../../lib/concepts";
 import { slotFor } from "../../../../lib/cadence";
 import { cleanStage } from "../../../../lib/stages";
-import { copyRelay, needsCopy, queueCopy } from "../../../../lib/copy";
+import { copyRelay, countLost, needsCopy, queueCopy } from "../../../../lib/copy";
 import { HANDLE_FIELDS, cleanHandle } from "../../../../lib/guests";
 import { episodeExtras } from "../../../../lib/links";
 import { secs } from "../../../../lib/time";
@@ -39,7 +39,13 @@ async function transcribeState(id: string, tr: Transcribe | null, hasPieces: boo
 // that sees it running writes, so two open tabs agree). A finished one is the full-episode piece's video, with the owner.
 async function editState(id: string, ed: FullEdit | null) {
   if (!ed || ed.status !== "running") return ed;
-  if (!ed.job) return ed;                 // claimed, the machine is starting
+  // claimed, the machine is starting; a claim that never got its machine (the request was cut off) has failed
+  if (!ed.job) {
+    if (Date.now() - Date.parse(ed.at) < 15 * 60000) return ed;
+    const failed: FullEdit = { ...ed, status: "failed", log: "FAILED to start: the editor's machine never started. Start it again." };
+    await db().from("studio_episodes").update({ full_edit: failed }).eq("id", id).filter("full_edit->>status", "eq", "running");
+    return failed;
+  }
   const s = await renderStatus(ed.job);
   if (!s.done) return { ...ed, log: s.status };
   const next: FullEdit = { ...ed, status: s.ok ? "ready" : "failed", log: s.status };
@@ -132,7 +138,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     const said = tx ? storage().download(tx.path).then(async (r) => (r.data ? parseTranscript(await r.data.text()) : null)).catch(() => null) : Promise.resolve(null);
     const all = (pcs.data ?? []) as Piece[];
     // A piece still without its caption or post (added by hand, or its first try ran out of time) starts now.
-    const due = all.filter((p) => needsCopy(p));
+    const due = await countLost(all.filter((p) => needsCopy(p)));
     if (due.length) {
       const c = await queueCopy(req, due.map((p) => p.id)).catch(() => null);
       for (const p of due) if (c?.ids.includes(p.id)) p.copy_since = c.at;

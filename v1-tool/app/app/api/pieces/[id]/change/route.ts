@@ -10,7 +10,7 @@ import { COACH } from "../../../../../lib/brand";
 
 export const runtime = "nodejs";
 // the change itself is quick; the coach's review after it runs after the response, a few minutes with the brain
-export const maxDuration = 300;
+export const maxDuration = 800;
 
 const MADE = ["draft", "changes", "ready", "approved", "scheduled"];
 const clock = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toFixed(1).padStart(4, "0")}`;
