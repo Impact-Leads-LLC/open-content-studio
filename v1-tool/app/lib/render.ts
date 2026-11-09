@@ -472,7 +472,7 @@ export async function startEdit(clip: string, engine: string, context: EditConte
 }
 
 // How long each kind of job's machine may run (the timeouts given to Sandbox.create above), by its id's prefix.
-const LIMIT_MIN: Record<string, number> = { render: 90, carousel: 45, stack: 60, transcribe: 120, fulledit: 180, animated: 45, thumb: 30, podcast: 60 };
+const LIMIT_MIN: Record<string, number> = { render: 90, carousel: 45, stack: 60, transcribe: 120, fulledit: 180, animated: 45, thumbs: 30, podcast: 60 };
 // A job whose machine is gone and never saved its log: once its time limit is long past, it ran out of time or was
 // shut down. Reporting it failed brings the retry buttons back instead of showing it running forever.
 function lostJob(id: string) {
